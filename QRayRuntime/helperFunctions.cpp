@@ -1,0 +1,34 @@
+#define _USE_MATH_DEFINES
+
+#include "helperFunctions.h"
+#include <cmath>
+#include "config.h"
+
+float CalcColorMult(float distance)
+{
+    float mult = 1.0f / (1.0f + distance * lightDecay);
+
+    if (mult > 1.0f)
+        mult = 1.0f;
+
+    if (mult < 0.1f)
+        mult = 0.1f;
+
+    return mult;
+}
+float CalcAmbientMult(float distanceFromCorner)
+{
+    float mult = 1.0f * distanceFromCorner + 0.5f;
+
+    if (mult > 1.0f)
+        mult = 1.0f;
+
+    if (mult < 0.5f)
+        mult = 0.5f;
+
+    return mult;
+}
+bool FloatEquals(float a, float b)
+{
+    return std::abs(a - b) < 0.001f;
+}

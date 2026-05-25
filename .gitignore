@@ -1,0 +1,30 @@
+# Visual Studio
+.vs/
+*.VC.db
+*.VC.opendb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output
+Debug/
+Release/
+x64/
+x86/
+bin/
+obj/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+
+# Generated
+*.log
+*.tmp
+
+# Windows
+Thumbs.db
+
+# Optional
+*.pdb

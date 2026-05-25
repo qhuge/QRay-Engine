@@ -1,0 +1,181 @@
+#define NOMINMAX
+
+#include "window_win32.h"
+#include "config.h"
+#include <cstdint>
+#include "renderer.h"
+
+static Win32State* gWin32 = nullptr;
+
+void ClearScreen(Win32State& win32, uint32_t color)
+{
+    for (int i = 0; i < WINDOW_WIDTH * WINDOW_HEIGHT; i++)
+    {
+        win32.pixels[i] = color;
+    }
+}
+
+void PutPixel(Win32State& win32, int x, int y, uint32_t color)
+{
+    if (x < 0 || x >= WINDOW_WIDTH ||
+        y < 0 || y >= WINDOW_HEIGHT)
+    {
+        return;
+    }
+
+    win32.pixels[y * WINDOW_WIDTH + x] = color;
+}
+
+bool KeyDown(int key)
+{
+    return (GetAsyncKeyState(key) & 0x8000);
+}
+
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
+{
+
+    Win32State win32 = {};
+
+    gWin32 = &win32;
+
+    win32.hInst = hInstance;
+
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
+
+    wcscpy_s(win32.szTitle, L"QRay Runtime");
+    wcscpy_s(win32.szWindowClass, L"QRayWindowClass");
+
+    MyRegisterClass(win32, hInstance);
+
+    win32.pixels = new uint32_t[WINDOW_WIDTH * WINDOW_HEIGHT];
+
+    if (!InitInstance(win32, hInstance, nCmdShow))
+    {
+        return FALSE;
+    }
+
+    // ==========================================
+    // Create framebuffer
+    // ==========================================
+
+    ZeroMemory(&win32.bitmapInfo, sizeof(win32.bitmapInfo));
+
+    win32.bitmapInfo.bmiHeader.biSize = sizeof(win32.bitmapInfo.bmiHeader);
+    win32.bitmapInfo.bmiHeader.biWidth = WINDOW_WIDTH;
+    win32.bitmapInfo.bmiHeader.biHeight = -WINDOW_HEIGHT;
+    win32.bitmapInfo.bmiHeader.biPlanes = 1;
+    win32.bitmapInfo.bmiHeader.biBitCount = 32;
+    win32.bitmapInfo.bmiHeader.biCompression = BI_RGB;
+
+    MSG msg = {};
+
+    // ==========================================
+    // Main Loop
+    // ==========================================
+
+    while (true)
+    {
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+            {
+                delete[] win32.pixels;
+                DestroyWindow(win32.hWnd);
+                return (int)msg.wParam;
+            }
+
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+        // Render frame
+        Render(win32);
+
+        // Force repaint
+        InvalidateRect(win32.hWnd, nullptr, FALSE);
+    }
+}
+
+ATOM MyRegisterClass(Win32State& win32, HINSTANCE hInstance)
+{
+    WNDCLASSEXW wcex = {};
+
+    wcex.cbSize = sizeof(WNDCLASSEX);
+
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.hInstance = hInstance;
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+
+    // No automatic background painting
+    wcex.hbrBackground = nullptr;
+
+    wcex.lpszClassName = win32.szWindowClass;
+
+    return RegisterClassExW(&wcex);
+}
+
+BOOL InitInstance(Win32State& win32, HINSTANCE hInstance, int nCmdShow)
+{
+    win32.hInst = hInstance;
+
+    HWND hWnd = CreateWindowW(
+        win32.szWindowClass,
+        L"QRay Runtime",
+        WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        WINDOW_WIDTH,
+        WINDOW_HEIGHT,
+        nullptr,
+        nullptr,
+        hInstance,
+        nullptr
+    );
+
+    if (!hWnd)
+    {
+        return FALSE;
+    }
+
+    win32.hWnd = hWnd;
+
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(win32.hWnd);
+
+    return TRUE;
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+
+        StretchDIBits(
+            hdc,
+            0, 0,
+            WINDOW_WIDTH, WINDOW_HEIGHT,
+            0, 0,
+            WINDOW_WIDTH, WINDOW_HEIGHT,
+            gWin32->pixels,
+            &gWin32->bitmapInfo,
+            DIB_RGB_COLORS,
+            SRCCOPY
+        );
+
+        EndPaint(hWnd, &ps);
+    }
+    return 0;
+
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+    }
+
+    return DefWindowProc(hWnd, message, wParam, lParam);
+}
