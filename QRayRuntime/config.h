@@ -1,25 +1,33 @@
 #pragma once
 
-extern float playerX;
+struct GameConfig {
+	char title[64];
 
-extern float playerY;
+	float playerX;
 
-const extern int renderDistance;
+	float playerY;
 
-extern const int WINDOW_WIDTH;
+	int renderDistance;
 
-extern const int WINDOW_HEIGHT;
+	int WINDOW_WIDTH;
 
-extern const float scale;
+	int WINDOW_HEIGHT;
 
-extern float angleOffset;
+	float scale;
 
-extern const float moveSpeed;
+	float angleOffset;
 
-extern const float runSpeed;
+	float moveSpeed;
 
-extern const float angleSpeed;
+	float runSpeed;
 
-extern const float lightDecay;
+	float angleSpeed;
 
-extern const float FOV;
+	float lightDecay;
+
+	float FOV;
+};
+
+extern GameConfig cfg;
+
+bool InitConfig();

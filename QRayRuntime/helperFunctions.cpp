@@ -6,7 +6,7 @@
 
 float CalcColorMult(float distance)
 {
-    float mult = 1.0f / (1.0f + distance * lightDecay);
+    float mult = 1.0f / (1.0f + distance * cfg.lightDecay);
 
     if (mult > 1.0f)
         mult = 1.0f;

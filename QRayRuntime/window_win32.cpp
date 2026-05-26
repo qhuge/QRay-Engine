@@ -5,12 +5,13 @@
 #include <cstdint>
 #include "renderer.h"
 #include "world.h"
+#include <string>
 
 static Win32State* gWin32 = nullptr;
 
 void ClearScreen(Win32State& win32, uint32_t color)
 {
-    for (int i = 0; i < WINDOW_WIDTH * WINDOW_HEIGHT; i++)
+    for (int i = 0; i < cfg.WINDOW_WIDTH * cfg.WINDOW_HEIGHT; i++)
     {
         win32.pixels[i] = color;
     }
@@ -18,13 +19,13 @@ void ClearScreen(Win32State& win32, uint32_t color)
 
 void PutPixel(Win32State& win32, int x, int y, uint32_t color)
 {
-    if (x < 0 || x >= WINDOW_WIDTH ||
-        y < 0 || y >= WINDOW_HEIGHT)
+    if (x < 0 || x >= cfg.WINDOW_WIDTH ||
+        y < 0 || y >= cfg.WINDOW_HEIGHT)
     {
         return;
     }
 
-    win32.pixels[y * WINDOW_WIDTH + x] = color;
+    win32.pixels[y * cfg.WINDOW_WIDTH + x] = color;
 }
 
 bool KeyDown(int key)
@@ -34,6 +35,10 @@ bool KeyDown(int key)
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
+    bool initSuccess = InitConfig();
+    if (!initSuccess) {
+        return 0;
+    }
     LoadWorld("map.txt");
 
     Win32State win32 = {};
@@ -45,12 +50,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    wcscpy_s(win32.szTitle, L"QRay Runtime");
+    //char[64] -> std::string -> wchar_t*
+    std::string narrowTitle = cfg.title;
+
+    std::wstring title(narrowTitle.begin(), narrowTitle.end());
+
+    wcscpy_s(win32.szTitle, title.c_str());
     wcscpy_s(win32.szWindowClass, L"QRayWindowClass");
 
     MyRegisterClass(win32, hInstance);
 
-    win32.pixels = new uint32_t[WINDOW_WIDTH * WINDOW_HEIGHT];
+    win32.pixels = new uint32_t[cfg.WINDOW_WIDTH * cfg.WINDOW_HEIGHT];
 
     if (!InitInstance(win32, hInstance, nCmdShow))
     {
@@ -64,8 +74,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     ZeroMemory(&win32.bitmapInfo, sizeof(win32.bitmapInfo));
 
     win32.bitmapInfo.bmiHeader.biSize = sizeof(win32.bitmapInfo.bmiHeader);
-    win32.bitmapInfo.bmiHeader.biWidth = WINDOW_WIDTH;
-    win32.bitmapInfo.bmiHeader.biHeight = -WINDOW_HEIGHT;
+    win32.bitmapInfo.bmiHeader.biWidth = cfg.WINDOW_WIDTH;
+    win32.bitmapInfo.bmiHeader.biHeight = -cfg.WINDOW_HEIGHT;
     win32.bitmapInfo.bmiHeader.biPlanes = 1;
     win32.bitmapInfo.bmiHeader.biBitCount = 32;
     win32.bitmapInfo.bmiHeader.biCompression = BI_RGB;
@@ -122,14 +132,19 @@ BOOL InitInstance(Win32State& win32, HINSTANCE hInstance, int nCmdShow)
 {
     win32.hInst = hInstance;
 
+    //char[64] -> std::string -> wchar_t*
+    std::string narrowTitle = cfg.title;
+
+    std::wstring title(narrowTitle.begin(), narrowTitle.end());
+
     HWND hWnd = CreateWindowW(
         win32.szWindowClass,
-        L"QRay Runtime",
+        title.c_str(),
         WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT,
+        cfg.WINDOW_WIDTH,
+        cfg.WINDOW_HEIGHT,
         nullptr,
         nullptr,
         hInstance,
@@ -161,9 +176,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         StretchDIBits(
             hdc,
             0, 0,
-            WINDOW_WIDTH, WINDOW_HEIGHT,
+            cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT,
             0, 0,
-            WINDOW_WIDTH, WINDOW_HEIGHT,
+            cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT,
             gWin32->pixels,
             &gWin32->bitmapInfo,
             DIB_RGB_COLORS,

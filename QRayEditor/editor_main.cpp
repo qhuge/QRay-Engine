@@ -1,10 +1,6 @@
 #include "editor_window.h"
 
-int APIENTRY wWinMain(
-    HINSTANCE hInstance,
-    HINSTANCE,
-    LPWSTR,
-    int nCmdShow)
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow)
 {
     EditorState editor = {};
 

@@ -82,7 +82,7 @@ RayHit CastRay(float posX, float posY, float angleDeg)
     // 0 = vertical wall
     // 1 = horizontal wall
 
-    for (int i = 0; i < renderDistance; i++)
+    for (int i = 0; i < cfg.renderDistance; i++)
     {
         int prevMapX = mapX;
         int prevMapY = mapY;
