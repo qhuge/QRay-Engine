@@ -4,6 +4,7 @@
 #include "config.h"
 #include <cstdint>
 #include "renderer.h"
+#include "world.h"
 
 static Win32State* gWin32 = nullptr;
 
@@ -33,6 +34,7 @@ bool KeyDown(int key)
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
+    LoadWorld("map.txt");
 
     Win32State win32 = {};
 

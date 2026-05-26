@@ -5,10 +5,13 @@ struct Tile
 {
     int x;
     int y;
+    int textureIndex;
 };
 
-extern const std::vector<Tile> worldWalls;
+extern std::vector<Tile> worldWalls;
 
 bool TileMatches(const Tile& tile, int x, int y);
 
 int FindWall(int x, int y);
+
+bool LoadWorld(const char* filename);

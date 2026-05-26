@@ -104,18 +104,10 @@ RayHit CastRay(float posX, float posY, float angleDeg)
             side = 1;
         }
 
-        // -----------------------------------------------------
-        // Check wall
-        // -----------------------------------------------------
-
         if (FindWall(mapX, mapY) == -1)
             continue;
 
         hit = true;
-
-        // =====================================================
-        // Compute exact hit distance
-        // =====================================================
 
         float perpWallDist;
 
@@ -131,10 +123,6 @@ RayHit CastRay(float posX, float posY, float angleDeg)
                 (mapY - posY + (1 - stepY) * 0.5f)
                 / rayDirY;
         }
-
-        // =====================================================
-        // Exact hit position
-        // =====================================================
 
         float wallHit;
 

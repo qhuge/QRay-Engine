@@ -1,13 +1,16 @@
 #include "world.h"
+#include <fstream>
 
-const std::vector<Tile> worldWalls =
-{
-    {100,104},
-    {101,105},
-    {99,105},
-    {99,103},
-    {101,103},
-};
+//const std::vector<Tile> worldWalls =
+//{
+//    {100,104, 0},
+//    {101,105, 0},
+//    {99,105, 0},
+//    {99,103, 0},
+//    {101,103, 0},
+//};
+
+std::vector<Tile> worldWalls;
 
 bool TileMatches(const Tile& tile, int x, int y)
 {
@@ -26,4 +29,25 @@ int FindWall(int x, int y)
         }
     }
     return -1;
+}
+
+bool LoadWorld(const char* filename)
+{
+    worldWalls.clear();
+
+    std::ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        return false;
+    }
+
+    Tile tile;
+
+    while (file >> tile.x >> tile.y >> tile.textureIndex)
+    {
+        worldWalls.push_back(tile);
+    }
+
+    return true;
 }
