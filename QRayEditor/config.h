@@ -12,7 +12,7 @@ static const int MAP_HEIGHT = 32;
 static const std::string RUNTIME_PATH = "QRayRuntime.exe";
 
 struct GameConfig {
-	char title[64] = "testGame";
+	char title[64] = "Example Game";
 
 	float playerX = 0.0f;
 
@@ -34,7 +34,7 @@ struct GameConfig {
 
 	float angleSpeed = 0.5f;
 
-	float lightDecay = 0.01f;
+	float lightDecay = 0.015f;
 
 	float FOV = 80.0f;
 };

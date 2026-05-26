@@ -47,12 +47,12 @@ void WriteData(const GameConfig& config, std::string buildFolder)
 }
 
 void build(std::string path) {
-	OutputDebugStringA(path.c_str());
-	OutputDebugStringA("\n");
-
 	OutputDebugStringA("BUILD STARTED\n");
 	//convert title to string
 	std::string title = cfg.title;
+
+	//remove spaces from the title
+	title.erase(std::remove_if(title.begin(), title.end(), isspace), title.end());
 
 	OutputDebugStringA(title.c_str());
 	OutputDebugStringA("\n");

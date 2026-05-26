@@ -7,11 +7,14 @@
 #include <string>
 #include "editor_helpers.h"
 #include "build.h"
+#include "editor_settings_ui.h"
+#include "config.h"
 
 #define ID_FILE_SAVE 1001
 #define ID_FILE_LOAD 1002
 #define ID_FILE_BUILD 1004
 #define ID_FILE_EXIT 1003
+#define ID_FILE_SETTINGS 1005
 
 static EditorState* gEditor = nullptr;
 
@@ -55,7 +58,7 @@ bool InitEditorWindow(
     HMENU hMenuBar = CreateMenu();
     HMENU hFileMenu = CreatePopupMenu();
 
-    AppendMenuW(
+    /*AppendMenuW(
         hFileMenu,
         MF_STRING,
         ID_FILE_SAVE,
@@ -65,12 +68,18 @@ bool InitEditorWindow(
         hFileMenu,
         MF_STRING,
         ID_FILE_LOAD,
-        L"Load");
+        L"Load");*/
+
     AppendMenuW(
         hFileMenu,
         MF_STRING,
         ID_FILE_BUILD,
         L"Build");
+    AppendMenuW(
+        hFileMenu,
+        MF_STRING,
+        ID_FILE_SETTINGS,
+        L"Settings");
 
     AppendMenuW(
         hFileMenu,
@@ -98,96 +107,97 @@ bool InitEditorWindow(
     return true;
 }
 
-LRESULT CALLBACK EditorWndProc(
-    HWND hWnd,
-    UINT message,
-    WPARAM wParam,
-    LPARAM lParam)
+LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    case WM_LBUTTONDOWN:
-    {
-        int mouseX = LOWORD(lParam);
-        int mouseY = HIWORD(lParam);
-
-        int tileX = mouseX / TILE_SIZE;
-        int tileY = mouseY / TILE_SIZE;
-
-        if (tileX >= 0 &&
-            tileX < MAP_WIDTH &&
-            tileY >= 0 &&
-            tileY < MAP_HEIGHT)
+        case WM_LBUTTONDOWN:
         {
-            worldMap.push_back(Tile { tileX, tileY, 0});
-            //worldMap[tileY][tileX] = 1;
-        }
+            int mouseX = LOWORD(lParam);
+            int mouseY = HIWORD(lParam);
 
-        InvalidateRect(hWnd, nullptr, FALSE);
-    }
-    break;
+            int tileX = mouseX / TILE_SIZE;
+            int tileY = mouseY / TILE_SIZE;
 
-    case WM_RBUTTONDOWN:
-    {
-        int mouseX = LOWORD(lParam);
-        int mouseY = HIWORD(lParam);
+            if (tileX >= 0 &&
+                tileX < MAP_WIDTH &&
+                tileY >= 0 &&
+                tileY < MAP_HEIGHT)
+            {
+                worldMap.push_back(Tile { tileX, tileY, 0});
+                //worldMap[tileY][tileX] = 1;
+            }
 
-        int tileX = mouseX / TILE_SIZE;
-        int tileY = mouseY / TILE_SIZE;
-
-        if (tileX >= 0 &&
-            tileX < MAP_WIDTH &&
-            tileY >= 0 &&
-            tileY < MAP_HEIGHT)
-        {
-            worldMap.erase(worldMap.begin() + FindWall(tileX, tileY));
-            //worldMap[tileY][tileX] = 0;
-        }
-
-        InvalidateRect(hWnd, nullptr, FALSE);
-    }
-    break;
-
-    case WM_COMMAND:
-    {
-        switch (LOWORD(wParam))
-        {
-        case ID_FILE_SAVE:
-            SaveMap();
-            break;
-
-        case ID_FILE_LOAD:
-            LoadMap();
             InvalidateRect(hWnd, nullptr, FALSE);
-            break;
-
-        case ID_FILE_EXIT:
-            PostQuitMessage(0);
-            break;
-        case ID_FILE_BUILD:
-            std::string buildLocation = SelectFolder();
-            build(buildLocation);
-            break;
         }
-    }
-    break;
+        break;
 
-    case WM_PAINT:
-    {
-        PAINTSTRUCT ps;
+        case WM_RBUTTONDOWN:
+        {
+            int mouseX = LOWORD(lParam);
+            int mouseY = HIWORD(lParam);
 
-        HDC hdc = BeginPaint(hWnd, &ps);
+            int tileX = mouseX / TILE_SIZE;
+            int tileY = mouseY / TILE_SIZE;
 
-        RenderEditor(hdc);
+            if (tileX >= 0 &&
+                tileX < MAP_WIDTH &&
+                tileY >= 0 &&
+                tileY < MAP_HEIGHT)
+            {
+                worldMap.erase(worldMap.begin() + FindWall(tileX, tileY));
+                //worldMap[tileY][tileX] = 0;
+            }
 
-        EndPaint(hWnd, &ps);
-    }
-    return 0;
+            InvalidateRect(hWnd, nullptr, FALSE);
+        }
+        break;
 
-    case WM_DESTROY:
-    {
-        PostQuitMessage(0);
-    }
+        case WM_COMMAND:
+        {
+            switch (LOWORD(wParam))
+            {
+            case ID_FILE_SAVE:
+                SaveMap();
+                break;
+
+            case ID_FILE_LOAD:
+                LoadMap();
+                InvalidateRect(hWnd, nullptr, FALSE);
+                break;
+
+            case ID_FILE_EXIT:
+                PostQuitMessage(0);
+                break;
+            case ID_FILE_BUILD:
+            {
+                std::string buildLocation = SelectFolder();
+                build(buildLocation);
+                break;
+            }
+            case ID_FILE_SETTINGS:
+                OpenSettingsWindow(gEditor->hInst, hWnd, cfg);
+                break;
+            }
+        }
+        break;
+
+        case WM_PAINT:
+        {
+            PAINTSTRUCT ps;
+
+            HDC hdc = BeginPaint(hWnd, &ps);
+
+            RenderEditor(hdc);
+
+            EndPaint(hWnd, &ps);
+        }
+        return 0;
+
+        case WM_DESTROY:
+        {
+            PostQuitMessage(0);
+        }
     return 0;
     }
 
