@@ -135,6 +135,7 @@
     <ClCompile Include="editor_renderer.cpp" />
     <ClCompile Include="editor_renderer.h" />
     <ClCompile Include="editor_settings_ui.cpp" />
+    <ClCompile Include="editor_viewport.cpp" />
     <ClCompile Include="editor_window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +144,7 @@
     <ClInclude Include="editor_helpers.h" />
     <ClInclude Include="editor_map.h" />
     <ClInclude Include="editor_settings_ui.h" />
+    <ClInclude Include="editor_viewport.h" />
     <ClInclude Include="editor_window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

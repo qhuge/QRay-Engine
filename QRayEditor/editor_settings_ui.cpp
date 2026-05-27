@@ -90,8 +90,6 @@ LRESULT CALLBACK SettingsWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
             GetWindowTextW(hHeightEdit, buffer, 64);
             gConfig->WINDOW_HEIGHT = _wtoi(buffer);
 
-            MessageBoxW(hWnd, L"Settings saved", L"OK", MB_OK);
-
             DestroyWindow(hWnd);
         }
     }

@@ -135,12 +135,16 @@
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Downloads\resource.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="helperFunctions.h" />
     <ClInclude Include="raycast.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="window_win32.h" />
     <ClInclude Include="world.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Downloads\resources.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

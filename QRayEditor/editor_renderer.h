@@ -4,4 +4,4 @@
 #define NOMINMAX
 #include <windows.h>
 
-void RenderEditor(HDC hdc);
+void RenderEditor(HDC hdc, HWND hWnd);

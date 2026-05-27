@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 #include "config.h"
 #include "build.h"
@@ -29,9 +30,13 @@ void WriteMap(std::string buildFolder) {
 
 	for (int i = 0; i < worldMap.size(); i++) {
 		Tile currentTile = worldMap[i];
-		std::string newString = std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " 0";
+		
+		//-1 means its the spawnpoint. dont write that to the actual map.
+		if (currentTile.textureIndex != -1) {
+			std::string newString = std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " 0";
 
-		outfile << newString << std::endl;
+			outfile << newString << std::endl;
+		}
 	}
 
 	outfile.close();
@@ -51,8 +56,8 @@ void build(std::string path) {
 	//convert title to string
 	std::string title = cfg.title;
 
-	//remove spaces from the title
-	title.erase(std::remove_if(title.begin(), title.end(), isspace), title.end());
+	//spaces to underscores for file names:
+	std::replace(title.begin(), title.end(), ' ', '_');
 
 	OutputDebugStringA(title.c_str());
 	OutputDebugStringA("\n");

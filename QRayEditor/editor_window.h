@@ -4,10 +4,13 @@
 
 #include <windows.h>
 
+#include "config.h"
+
 struct EditorState
 {
     HINSTANCE hInst;
     HWND hWnd;
+    GameConfig config;
 };
 
 bool InitEditorWindow(

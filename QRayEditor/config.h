@@ -6,8 +6,8 @@ static const int WINDOW_HEIGHT = 720;
 
 static const int TILE_SIZE = 32;
 
-static const int MAP_WIDTH = 32;
-static const int MAP_HEIGHT = 32;
+static const int MAP_WIDTH = 50;
+static const int MAP_HEIGHT = 50;
 
 static const std::string RUNTIME_PATH = "QRayRuntime.exe";
 
@@ -18,7 +18,7 @@ struct GameConfig {
 
 	float playerY = 0.0f;
 
-	int renderDistance = 20;
+	int renderDistance = 30;
 
 	int WINDOW_WIDTH = 640;
 
@@ -34,7 +34,7 @@ struct GameConfig {
 
 	float angleSpeed = 0.5f;
 
-	float lightDecay = 0.015f;
+	float lightDecay = 0.02f;
 
 	float FOV = 80.0f;
 };

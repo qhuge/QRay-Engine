@@ -3,12 +3,12 @@
 #include "editor_window.h"
 #include "editor_renderer.h"
 #include "editor_map.h"
-#include "config.h"
 #include <string>
 #include "editor_helpers.h"
 #include "build.h"
 #include "editor_settings_ui.h"
 #include "config.h"
+#include "editor_viewport.h"
 
 #define ID_FILE_SAVE 1001
 #define ID_FILE_LOAD 1002
@@ -18,10 +18,13 @@
 
 static EditorState* gEditor = nullptr;
 
-bool InitEditorWindow(
-    EditorState& editor,
-    HINSTANCE hInstance,
-    int nCmdShow)
+static HWND gViewportWindow = nullptr;
+static HWND gBlockList = nullptr;
+static HWND gNewMapButton = nullptr;
+static HWND gSaveButton = nullptr;
+
+
+bool InitEditorWindow(EditorState& editor, HINSTANCE hInstance, int nCmdShow)
 {
     gEditor = &editor;
 
@@ -31,6 +34,7 @@ bool InitEditorWindow(
     wc.hInstance = hInstance;
     wc.lpszClassName = L"QRayEditorClass";
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
 
     RegisterClassW(&wc);
 
@@ -51,6 +55,113 @@ bool InitEditorWindow(
     {
         return false;
     }
+
+    WNDCLASSW viewportClass = {};
+    viewportClass.style =CS_HREDRAW | CS_VREDRAW;
+    viewportClass.lpfnWndProc = ViewportWndProc;
+    viewportClass.hInstance = hInstance;
+    viewportClass.lpszClassName = L"QRayViewportClass";
+    viewportClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    viewportClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+
+    RegisterClassW(&viewportClass);
+
+    gViewportWindow = CreateWindowW(
+        L"QRayViewportClass",
+        L"",
+        WS_CHILD | WS_VISIBLE | WS_BORDER,
+        0,
+        0,
+        800,
+        600,
+        hWnd,
+        nullptr,
+        hInstance,
+        nullptr);
+
+    if (!gViewportWindow)
+    {
+        MessageBoxA(
+            nullptr,
+            "Viewport creation failed",
+            "Error",
+            MB_OK);
+
+        return false;
+    }
+
+    gBlockList = CreateWindowW(
+        L"LISTBOX",
+        nullptr,
+        WS_CHILD |
+        WS_VISIBLE |
+        WS_BORDER |
+        LBS_NOTIFY,
+        820,
+        20,
+        200,
+        200,
+        hWnd,
+        (HMENU)3001,
+        hInstance,
+        nullptr);
+
+    //BLOCK TYPES
+    SendMessageW(
+        gBlockList,
+        LB_ADDSTRING,
+        0,
+        (LPARAM)L"Stone");
+
+    SendMessageW(
+        gBlockList,
+        LB_ADDSTRING,
+        0,
+        (LPARAM)L"Brick");
+
+    SendMessageW(
+        gBlockList,
+        LB_ADDSTRING,
+        0,
+        (LPARAM)L"Metal");
+
+    SendMessageW(
+        gBlockList,
+        LB_ADDSTRING,
+        0,
+        (LPARAM)L"Spawnpoint");
+
+    SendMessageW(
+        gBlockList,
+        LB_SETCURSEL,
+        0,
+        0);
+
+    gNewMapButton = CreateWindowW(
+        L"BUTTON",
+        L"New Map",
+        WS_CHILD | WS_VISIBLE,
+        820,
+        250,
+        200,
+        40,
+        hWnd,
+        (HMENU)4001,
+        hInstance,
+        nullptr);
+
+    gSaveButton = CreateWindowW(
+        L"BUTTON",
+        L"Save Map",
+        WS_CHILD | WS_VISIBLE,
+        820,
+        300,
+        200,
+        40,
+        hWnd,
+        (HMENU)4002,
+        hInstance,
+        nullptr);
 
     editor.hWnd = hWnd;
     editor.hInst = hInstance;
@@ -101,6 +212,12 @@ bool InitEditorWindow(
 
     SetMenu(hWnd, hMenuBar);
 
+    RECT rect;
+
+    GetClientRect(hWnd, &rect);
+
+    SendMessage(hWnd, WM_SIZE, 0, MAKELPARAM(rect.right, rect.bottom));
+
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
@@ -111,48 +228,6 @@ LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 {
     switch (message)
     {
-        case WM_LBUTTONDOWN:
-        {
-            int mouseX = LOWORD(lParam);
-            int mouseY = HIWORD(lParam);
-
-            int tileX = mouseX / TILE_SIZE;
-            int tileY = mouseY / TILE_SIZE;
-
-            if (tileX >= 0 &&
-                tileX < MAP_WIDTH &&
-                tileY >= 0 &&
-                tileY < MAP_HEIGHT)
-            {
-                worldMap.push_back(Tile { tileX, tileY, 0});
-                //worldMap[tileY][tileX] = 1;
-            }
-
-            InvalidateRect(hWnd, nullptr, FALSE);
-        }
-        break;
-
-        case WM_RBUTTONDOWN:
-        {
-            int mouseX = LOWORD(lParam);
-            int mouseY = HIWORD(lParam);
-
-            int tileX = mouseX / TILE_SIZE;
-            int tileY = mouseY / TILE_SIZE;
-
-            if (tileX >= 0 &&
-                tileX < MAP_WIDTH &&
-                tileY >= 0 &&
-                tileY < MAP_HEIGHT)
-            {
-                worldMap.erase(worldMap.begin() + FindWall(tileX, tileY));
-                //worldMap[tileY][tileX] = 0;
-            }
-
-            InvalidateRect(hWnd, nullptr, FALSE);
-        }
-        break;
-
         case WM_COMMAND:
         {
             switch (LOWORD(wParam))
@@ -163,7 +238,7 @@ LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 
             case ID_FILE_LOAD:
                 LoadMap();
-                InvalidateRect(hWnd, nullptr, FALSE);
+                InvalidateRect(gViewportWindow, nullptr, TRUE);
                 break;
 
             case ID_FILE_EXIT:
@@ -171,32 +246,92 @@ LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
                 break;
             case ID_FILE_BUILD:
             {
+                if (!hasSelectedSpawnPoint) {
+                    MessageBoxW(hWnd, L"No spawnpoint chosen. Choose a spawnpoint before building the game!", L"OK", MB_OK);
+                    break;
+                }
                 std::string buildLocation = SelectFolder();
                 build(buildLocation);
                 break;
             }
             case ID_FILE_SETTINGS:
-                OpenSettingsWindow(gEditor->hInst, hWnd, cfg);
+                OpenSettingsWindow(
+                    gEditor->hInst,
+                    hWnd,
+                    cfg);
                 break;
             }
+            case 3001:
+            {
+                if (HIWORD(wParam) == LBN_SELCHANGE)
+                {
+                    gSelectedBlockType =
+                        (int)SendMessageW(
+                            gBlockList,
+                            LB_GETCURSEL,
+                            0,
+                            0);
+                }
+            }
+            break;
         }
         break;
-
-        case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-
-            HDC hdc = BeginPaint(hWnd, &ps);
-
-            RenderEditor(hdc);
-
-            EndPaint(hWnd, &ps);
-        }
-        return 0;
 
         case WM_DESTROY:
         {
             PostQuitMessage(0);
+            return 0;
+        }
+
+        case WM_SIZE:
+        {
+            RECT clientRect;
+
+            GetClientRect(hWnd, &clientRect);
+
+            int width = clientRect.right;
+            int height = clientRect.bottom;
+
+            int rightPanelWidth = 240;
+
+            MoveWindow(
+                gViewportWindow,
+                0,
+                0,
+                width - rightPanelWidth,
+                height,
+                TRUE);
+
+            MoveWindow(
+                gBlockList,
+                width - rightPanelWidth + 20,
+                20,
+                200,
+                200,
+                TRUE);
+
+            MoveWindow(
+                gNewMapButton,
+                width - rightPanelWidth + 20,
+                250,
+                200,
+                40,
+                TRUE);
+
+            MoveWindow(
+                gSaveButton,
+                width - rightPanelWidth + 20,
+                300,
+                200,
+                40,
+                TRUE);
+
+            InvalidateRect(
+                gViewportWindow,
+                nullptr,
+                TRUE);
+
+            return 0;
         }
     return 0;
     }
