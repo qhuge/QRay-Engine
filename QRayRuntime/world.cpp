@@ -51,3 +51,22 @@ bool LoadWorld(const char* filename)
 
     return true;
 }
+
+Texture LoadQRayAsset(std::string path)
+{
+    std::ifstream file(path, std::ios::binary);
+
+    QRayTextureAssetHeader header;
+    file.read((char*)&header, sizeof(header));
+
+    Texture tex;
+    tex.width = header.width;
+    tex.height = header.height;
+
+    size_t size = header.width * header.height * 4;
+    tex.pixels.resize(size);
+
+    file.read((char*)tex.pixels.data(), size);
+
+    return tex;
+}

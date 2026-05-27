@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 struct GameConfig {
 	char title[64];
@@ -13,8 +14,6 @@ struct GameConfig {
 
 	int WINDOW_HEIGHT;
 
-	float scale;
-
 	float angleOffset;
 
 	float moveSpeed;
@@ -26,8 +25,25 @@ struct GameConfig {
 	float lightDecay;
 
 	float FOV;
+
+	int textureAmount;
 };
 
 extern GameConfig cfg;
 
 bool InitConfig();
+
+struct Texture
+{
+	uint32_t width;
+	uint32_t height;
+	std::vector<unsigned char> pixels;
+};
+struct QRayTextureAssetHeader
+{
+	uint32_t width;
+	uint32_t height;
+	uint32_t channels;
+};
+
+extern std::vector<Texture> gTextures;

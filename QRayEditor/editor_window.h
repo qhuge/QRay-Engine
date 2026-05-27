@@ -6,6 +6,8 @@
 
 #include "config.h"
 
+void RefreshBlockList();
+
 struct EditorState
 {
     HINSTANCE hInst;

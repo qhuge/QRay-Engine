@@ -71,8 +71,8 @@ void Render(Win32State& win32)
         moveY /= length;
     }
 
-    cfg.playerX += moveX * moveSpeedNow;
-    cfg.playerY += moveY * moveSpeedNow;
+    cfg.playerX += moveX * moveSpeedNow * deltaTime;
+    cfg.playerY += moveY * moveSpeedNow * deltaTime;
 
     // =========================================
     // ROTATION
@@ -80,12 +80,12 @@ void Render(Win32State& win32)
 
     if (KeyDown(VK_RIGHT))
     {
-        cfg.angleOffset += cfg.angleSpeed;
+        cfg.angleOffset += cfg.angleSpeed * deltaTime;
     }
 
     if (KeyDown(VK_LEFT))
     {
-        cfg.angleOffset -= cfg.angleSpeed;
+        cfg.angleOffset -= cfg.angleSpeed * deltaTime;
     }
 
     if (cfg.angleOffset >= 270) { cfg.angleOffset = -90; }
@@ -115,16 +115,16 @@ void Render(Win32State& win32)
     // RAYCAST RENDERING
     // =========================================
 
+    
+    float projectionPlaneDistance = (cfg.WINDOW_WIDTH / 2.0f) / tanf((cfg.FOV * 0.5f) * M_PI / 180.0f);
+    for (int x = 0; x < cfg.WINDOW_WIDTH; x++) {
+        float rayAngle = cfg.angleOffset - (cfg.FOV / 2.0f) + ((float)x / cfg.WINDOW_WIDTH) * cfg.FOV;
 
-
-    float currentX = 0;
-    for (int k = ((-(cfg.FOV / 2.0f)) + cfg.angleOffset) * cfg.scale; k <= ((cfg.FOV / 2.0f) + cfg.angleOffset) * cfg.scale; k++) {
-        float i = k / cfg.scale;
-        RayHit hit = CastRay(cfg.playerX, cfg.playerY, i);
+        RayHit hit = CastRay(cfg.playerX, cfg.playerY, rayAngle);
 
         if (hit.distance > 0.0f)
         {
-            float correctedDistance = cosf((i - cfg.angleOffset) * M_PI / 180.0f) * hit.distance;
+            float correctedDistance = cosf((rayAngle - cfg.angleOffset) * M_PI / 180.0f) * hit.distance;
 
             if (correctedDistance < 0.01f)
             {
@@ -134,38 +134,66 @@ void Render(Win32State& win32)
             float projectionPlaneDistance = (cfg.WINDOW_WIDTH / 2.0f) / tanf((cfg.FOV * 0.5f) * M_PI / 180.0f);
             float wallHeight = projectionPlaneDistance / correctedDistance;
 
+            int textureIndex = hit.textureIndex;
+            bool isValidTexture = true;
 
-            //fixes low fps near walls
-            if (wallHeight > cfg.WINDOW_HEIGHT) {
-                wallHeight = cfg.WINDOW_HEIGHT;
+            Texture* tex = nullptr;
+
+            if (textureIndex >= 0 && textureIndex < gTextures.size())
+            {
+                tex = &gTextures[textureIndex];
             }
 
-            int mirrorY = 1;
-            for (int p = (cfg.WINDOW_HEIGHT / 2); p <= ((wallHeight / 2) + (cfg.WINDOW_HEIGHT / 2)); p++) {
+            
 
-                float brightness = 255.0f * CalcColorMult(correctedDistance);
+            int startY = cfg.WINDOW_HEIGHT / 2 - (wallHeight / 2);
 
-                brightness *= hit.ambient;
+            int endY = startY + (int)wallHeight;
 
-                /*std::string msg = std::to_string(brightness) + "\n";
-                OutputDebugStringA(msg.c_str());*/
+            for (int p = startY; p < endY; p++)
+            {
+                if (p < 0 || p > cfg.WINDOW_HEIGHT) {
+                    continue;
+                }
 
-                if (brightness > 255.0f)
-                    brightness = 255.0f;
+                float brightness = CalcColorMult(correctedDistance) * hit.ambient;
 
-                if (brightness < 0.0f)
-                    brightness = 0.0f;
+                float r;
+                float g;
+                float b;
 
-                uint8_t c = (uint8_t)brightness;
+                if (!tex) {
+                    r = 1.0;
+                    g = 0.0f;
+                    b = 1.0f;
+                }
+                else {
+                    int texX = (int)(hit.textureX * tex->width);
 
-                uint32_t color = (c << 16) | (c << 8) | c;
-                PutPixel(win32, std::round(currentX), p, color);
-                PutPixel(win32, std::round(currentX), ((cfg.WINDOW_HEIGHT / 2) - mirrorY), color);
+                    int texY = ((p - startY) * tex->height) / (int)wallHeight;
 
-                mirrorY++;
+                    texX = clampInt(texX, tex->width - 1);
+                    texY = clampInt(texY, tex->height - 1);
+
+                    int index = (texY * tex->width + texX) * 4;
+
+                    r = tex->pixels[index + 0] / 255.0f;
+                    g = tex->pixels[index + 1] / 255.0f;
+                    b = tex->pixels[index + 2] / 255.0f;
+                }
+                
+
+                r *= brightness;
+                g *= brightness;
+                b *= brightness;
+
+                uint32_t color =
+                    ((uint8_t)(r * 255) << 16) |
+                    ((uint8_t)(g * 255) << 8) |
+                    ((uint8_t)(b * 255));
+
+                PutPixel(win32, x, p, color);
             }
         }
-
-        currentX += cfg.WINDOW_WIDTH / (cfg.FOV * cfg.scale);
     }
 }

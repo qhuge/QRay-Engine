@@ -104,7 +104,9 @@ RayHit CastRay(float posX, float posY, float angleDeg)
             side = 1;
         }
 
-        if (FindWall(mapX, mapY) == -1)
+        int WallIndex = FindWall(mapX, mapY);
+
+        if (WallIndex == -1)
             continue;
 
         hit = true;
@@ -141,9 +143,7 @@ RayHit CastRay(float posX, float posY, float angleDeg)
         float textureX =
             wallHit - std::floor(wallHit);
 
-        // =====================================================
-        // Ambient occlusion
-        // =====================================================
+        //Ambient occlusion
 
         float ambient = 1.0f;
 
@@ -196,11 +196,15 @@ RayHit CastRay(float posX, float posY, float angleDeg)
             }
         }
 
+        //Fetch texture index
+        int wallTextureIndex = worldWalls[WallIndex].textureIndex;
+
         return RayHit(
             perpWallDist,
             textureX,
-            ambient);
+            ambient,
+            wallTextureIndex);
     }
 
-    return RayHit(-1.0f, 0.0f, 0.0f);
+    return RayHit(-1.0f, 0.0f, 0.0f, 0);
 }

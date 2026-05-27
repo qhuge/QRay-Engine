@@ -2,6 +2,10 @@
 
 #include <windows.h>
 #include <cstdint>
+#include <chrono>
+
+//std::chrono::high_resolution_clock::time_point lastTime;
+extern float deltaTime;
 
 struct Win32State
 {

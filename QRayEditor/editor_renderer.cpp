@@ -2,7 +2,7 @@
 #include "editor_map.h"
 #include "config.h"
 #include "editor_viewport.h"
-int abcd = 123;
+int abcd = 1234;
 void RenderEditor(HDC hdc, HWND hWnd)
 {
     RECT clientRect;

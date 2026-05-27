@@ -6,6 +6,11 @@
 #include "renderer.h"
 #include "world.h"
 #include <string>
+#include <chrono>
+
+static auto lastTime = std::chrono::high_resolution_clock::now();
+
+float deltaTime = 0.0f;
 
 static Win32State* gWin32 = nullptr;
 
@@ -39,6 +44,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     if (!initSuccess) {
         return 0;
     }
+
+    //TODO get amount of textures from the gamedata. for debug there's just 1 texture
+    for (int i = 0; i < cfg.textureAmount; i++) {
+        Texture txt = LoadQRayAsset("assets\\" + std::to_string(i) + ".qrayasset");
+        gTextures.push_back(txt);
+    }
+
     LoadWorld("map.txt");
 
     Win32State win32 = {};
@@ -88,6 +100,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     while (true)
     {
+        auto currentTime = std::chrono::high_resolution_clock::now();
+
+        deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
+
+        lastTime = currentTime;
+
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
@@ -184,6 +202,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DIB_RGB_COLORS,
             SRCCOPY
         );
+
+        auto current = std::chrono::high_resolution_clock::now();
+
+        float deltaTime = std::chrono::duration<float>(current - lastTime).count();
+
+        lastTime = current;
 
         EndPaint(hWnd, &ps);
     }

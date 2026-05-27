@@ -56,3 +56,5 @@ bool InitConfig() {
 
     return true;
 }
+
+std::vector<Texture> gTextures;

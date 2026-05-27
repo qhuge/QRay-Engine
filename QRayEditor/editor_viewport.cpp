@@ -43,8 +43,9 @@ LRESULT CALLBACK ViewportWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
             tileY < MAP_HEIGHT &&
             FindWall(tileX, tileY) == -1)
         {
+
             //spawnpoint
-            if (gSelectedBlockType == 3) {
+            if (gSelectedBlockType == gBlockTypes.size()) {
                 if (!hasSelectedSpawnPoint) {
                     cfg.playerX = tileX;
                     cfg.playerY = tileY;
@@ -59,11 +60,12 @@ LRESULT CALLBACK ViewportWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
                 
             }
             else {
+                gBlockTypes[gSelectedBlockType].timesUsed++;
                 worldMap.push_back(
                     {
                         tileX,
                         tileY,
-                        0
+                        gSelectedBlockType,
                     });
             }
             
@@ -92,6 +94,8 @@ LRESULT CALLBACK ViewportWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
             if (worldMap[wallIndex].textureIndex == -1) {
                 hasSelectedSpawnPoint = false;
             }
+
+            gBlockTypes[gSelectedBlockType].timesUsed--;
             worldMap.erase(worldMap.begin() + wallIndex);
         }
 

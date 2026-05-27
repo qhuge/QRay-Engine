@@ -32,3 +32,13 @@ bool FloatEquals(float a, float b)
 {
     return std::abs(a - b) < 0.001f;
 }
+
+int clampInt(int a, int max) {
+    if (a < 0) {
+        a = 0;
+    }
+    else if (a > max) {
+        a = max;
+    }
+    return a;
+}

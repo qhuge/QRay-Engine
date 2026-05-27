@@ -9,20 +9,43 @@
 #include "editor_settings_ui.h"
 #include "config.h"
 #include "editor_viewport.h"
+#include "editor_add_block_ui.h"
 
 #define ID_FILE_SAVE 1001
 #define ID_FILE_LOAD 1002
 #define ID_FILE_BUILD 1004
 #define ID_FILE_EXIT 1003
 #define ID_FILE_SETTINGS 1005
+#define ID_ADD_BLOCK 5001
 
 static EditorState* gEditor = nullptr;
 
 static HWND gViewportWindow = nullptr;
+static HWND gAddBlockButton = nullptr;
 static HWND gBlockList = nullptr;
 static HWND gNewMapButton = nullptr;
 static HWND gSaveButton = nullptr;
+static HWND gBlockLabel = nullptr;
 
+void RefreshBlockList()
+{
+    SendMessageW(gBlockList, LB_RESETCONTENT, 0, 0);
+
+    for (const BlockType& block : gBlockTypes)
+    {
+        std::wstring wName( block.name.begin(), block.name.end());
+
+        SendMessageW(gBlockList, LB_ADDSTRING, 0, (LPARAM)wName.c_str());
+    }
+
+    SendMessageW(
+        gBlockList,
+        LB_ADDSTRING,
+        0,
+        (LPARAM)L"Spawnpoint");
+
+    SendMessageW(gBlockList, LB_SETCURSEL, 0, 0);
+}
 
 bool InitEditorWindow(EditorState& editor, HINSTANCE hInstance, int nCmdShow)
 {
@@ -90,6 +113,32 @@ bool InitEditorWindow(EditorState& editor, HINSTANCE hInstance, int nCmdShow)
         return false;
     }
 
+    gAddBlockButton = CreateWindowW(
+        L"BUTTON",
+        L"+",
+        WS_CHILD | WS_VISIBLE,
+        820,
+        20,
+        40,
+        40,
+        hWnd,
+        (HMENU)ID_ADD_BLOCK,
+        hInstance,
+        nullptr);
+
+    gBlockLabel = CreateWindowW(
+        L"STATIC",
+        L"Block Types",
+        WS_CHILD | WS_VISIBLE,
+        870,
+        30,
+        120,
+        20,
+        hWnd,
+        nullptr,
+        hInstance,
+        nullptr);
+
     gBlockList = CreateWindowW(
         L"LISTBOX",
         nullptr,
@@ -98,7 +147,7 @@ bool InitEditorWindow(EditorState& editor, HINSTANCE hInstance, int nCmdShow)
         WS_BORDER |
         LBS_NOTIFY,
         820,
-        20,
+        70,
         200,
         200,
         hWnd,
@@ -106,38 +155,9 @@ bool InitEditorWindow(EditorState& editor, HINSTANCE hInstance, int nCmdShow)
         hInstance,
         nullptr);
 
-    //BLOCK TYPES
-    SendMessageW(
-        gBlockList,
-        LB_ADDSTRING,
-        0,
-        (LPARAM)L"Stone");
+    RefreshBlockList();
 
-    SendMessageW(
-        gBlockList,
-        LB_ADDSTRING,
-        0,
-        (LPARAM)L"Brick");
-
-    SendMessageW(
-        gBlockList,
-        LB_ADDSTRING,
-        0,
-        (LPARAM)L"Metal");
-
-    SendMessageW(
-        gBlockList,
-        LB_ADDSTRING,
-        0,
-        (LPARAM)L"Spawnpoint");
-
-    SendMessageW(
-        gBlockList,
-        LB_SETCURSEL,
-        0,
-        0);
-
-    gNewMapButton = CreateWindowW(
+    /*gNewMapButton = CreateWindowW(
         L"BUTTON",
         L"New Map",
         WS_CHILD | WS_VISIBLE,
@@ -148,9 +168,9 @@ bool InitEditorWindow(EditorState& editor, HINSTANCE hInstance, int nCmdShow)
         hWnd,
         (HMENU)4001,
         hInstance,
-        nullptr);
+        nullptr);*/
 
-    gSaveButton = CreateWindowW(
+    /*gSaveButton = CreateWindowW(
         L"BUTTON",
         L"Save Map",
         WS_CHILD | WS_VISIBLE,
@@ -161,7 +181,7 @@ bool InitEditorWindow(EditorState& editor, HINSTANCE hInstance, int nCmdShow)
         hWnd,
         (HMENU)4002,
         hInstance,
-        nullptr);
+        nullptr);*/
 
     editor.hWnd = hWnd;
     editor.hInst = hInstance;
@@ -251,29 +271,33 @@ LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
                     break;
                 }
                 std::string buildLocation = SelectFolder();
+                if (buildLocation.length() == 0) {
+                    MessageBoxW(hWnd, L"Invalid build path", L"OK", MB_OK);
+                    break;
+                }
                 build(buildLocation);
                 break;
             }
             case ID_FILE_SETTINGS:
-                OpenSettingsWindow(
-                    gEditor->hInst,
-                    hWnd,
-                    cfg);
+                OpenSettingsWindow(gEditor->hInst, hWnd, cfg);
                 break;
-            }
+
             case 3001:
             {
                 if (HIWORD(wParam) == LBN_SELCHANGE)
                 {
-                    gSelectedBlockType =
-                        (int)SendMessageW(
-                            gBlockList,
-                            LB_GETCURSEL,
-                            0,
-                            0);
+                    gSelectedBlockType = (int)SendMessageW(gBlockList, LB_GETCURSEL, 0, 0);
                 }
             }
             break;
+
+            case ID_ADD_BLOCK:
+            {
+                OpenAddBlockWindow(gEditor->hInst, hWnd);
+            }
+            break;
+            }
+            
         }
         break;
 
@@ -295,6 +319,22 @@ LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
             int rightPanelWidth = 240;
 
             MoveWindow(
+                gAddBlockButton,
+                width - rightPanelWidth + 20,
+                20,
+                40,
+                40,
+                TRUE);
+
+            MoveWindow(
+                gBlockLabel,
+                width - rightPanelWidth + 70,
+                30,
+                120,
+                20,
+                TRUE);
+
+            MoveWindow(
                 gViewportWindow,
                 0,
                 0,
@@ -305,7 +345,7 @@ LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
             MoveWindow(
                 gBlockList,
                 width - rightPanelWidth + 20,
-                20,
+                70,
                 200,
                 200,
                 TRUE);
@@ -326,10 +366,13 @@ LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
                 40,
                 TRUE);
 
-            InvalidateRect(
-                gViewportWindow,
+            RedrawWindow(
+                hWnd,
                 nullptr,
-                TRUE);
+                nullptr,
+                RDW_INVALIDATE |
+                RDW_ERASE |
+                RDW_ALLCHILDREN);
 
             return 0;
         }

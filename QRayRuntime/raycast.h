@@ -5,8 +5,9 @@ struct RayHit
     float distance;
     float textureX;
     float ambient;
+    int textureIndex;
 
-    RayHit(float d = -1.0f, float tx = 0.0f, float amb = 0.0f) : distance(d), textureX(tx), ambient(amb)
+    RayHit(float d = -1.0f, float tx = 0.0f, float amb = 0.0f, int ti = 0) : distance(d), textureX(tx), ambient(amb), textureIndex(ti)
     {
     }
 };
