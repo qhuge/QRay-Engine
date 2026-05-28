@@ -1,7 +1,7 @@
-#include "editor_renderer.h"
-#include "editor_map.h"
-#include "config.h"
-#include "editor_viewport.h"
+#include "editor_renderer.hpp"
+#include "editor_map.hpp"
+#include "config.hpp"
+#include "editor_viewport.hpp"
 int abcd = 1234;
 void RenderEditor(HDC hdc, HWND hWnd)
 {
@@ -59,12 +59,14 @@ void RenderEditor(HDC hdc, HWND hWnd)
             if (wallIndex != -1)
             {
                 HBRUSH brush;
-                 
-                if (worldMap[wallIndex].textureIndex == -1) {
-                    brush = CreateSolidBrush(RGB(255, 255, 0));
+
+                if (worldMap[wallIndex].textureIndex != -1) {
+                    BlockType& type = gBlockTypes[worldMap[wallIndex].textureIndex];
+
+                    brush = CreateSolidBrush(RGB(type.colorR, type.colorG, type.colorB));
                 }
                 else {
-                    brush = CreateSolidBrush(RGB(220, 220, 220));
+                    brush = CreateSolidBrush(RGB(255, 255, 0));
                 }
 
                 FillRect(hdc, &rect, brush);
@@ -73,10 +75,7 @@ void RenderEditor(HDC hdc, HWND hWnd)
             }
 
             // draw grid lines
-            FrameRect(
-                hdc,
-                &rect,
-                (HBRUSH)GetStockObject(BLACK_BRUSH));
+            FrameRect(hdc, &rect, (HBRUSH)GetStockObject(BLACK_BRUSH));
         }
     }
 }

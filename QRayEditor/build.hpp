@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "editor_map.h"
+#include "editor_map.hpp"
 
 std::string GetExecutableDirectory();
 

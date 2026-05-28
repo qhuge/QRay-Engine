@@ -1,5 +1,7 @@
 #pragma once
 
+#include <windows.h>
+
 #include <string>
 #include <vector>
 
@@ -55,6 +57,10 @@ struct BlockType
 	std::string name;
 
 	std::string texturePath;
+
+	int colorR = 220;
+	int colorG = 220;
+	int colorB = 220;
 
 	int timesUsed = 0;
 };

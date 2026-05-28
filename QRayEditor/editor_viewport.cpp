@@ -3,10 +3,10 @@
 
 #include <windows.h>
 
-#include "editor_viewport.h"
-#include "editor_renderer.h"
-#include "editor_map.h"
-#include "config.h"
+#include "editor_viewport.hpp"
+#include "editor_renderer.hpp"
+#include "editor_map.hpp"
+#include "config.hpp"
 
 int gCameraX = 0;
 int gCameraY = 0;
@@ -94,8 +94,10 @@ LRESULT CALLBACK ViewportWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
             if (worldMap[wallIndex].textureIndex == -1) {
                 hasSelectedSpawnPoint = false;
             }
+            else {
+                gBlockTypes[gSelectedBlockType].timesUsed--;
+            }
 
-            gBlockTypes[gSelectedBlockType].timesUsed--;
             worldMap.erase(worldMap.begin() + wallIndex);
         }
 

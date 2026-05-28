@@ -1,6 +1,10 @@
 #include <windows.h>
 #include <shlobj.h>
 #include <string>
+#include <vector>
+#include "editor_helpers.hpp"
+#include <iostream>
+#include <fstream>
 
 std::string SelectFolder()
 {
@@ -73,4 +77,9 @@ std::string SelectFolder()
     pfd->Release();
 
     return std::string(path);
+}
+
+bool fileExists(const std::string& filename) {
+    std::ifstream file(filename);
+    return file.good();
 }

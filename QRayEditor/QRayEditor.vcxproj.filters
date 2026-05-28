@@ -21,7 +21,7 @@
     <ClCompile Include="editor_map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="editor_renderer.h">
+    <ClCompile Include="editor_renderer.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="editor_renderer.cpp">
@@ -50,28 +50,28 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.h">
+    <ClInclude Include="config.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="editor_window.h">
+    <ClInclude Include="editor_window.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="editor_map.h">
+    <ClInclude Include="editor_map.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="build.h">
+    <ClInclude Include="build.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="editor_helpers.h">
+    <ClInclude Include="editor_helpers.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="editor_settings_ui.h">
+    <ClInclude Include="editor_settings_ui.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="editor_viewport.h">
+    <ClInclude Include="editor_viewport.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="editor_add_block_ui.h">
+    <ClInclude Include="editor_add_block_ui.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

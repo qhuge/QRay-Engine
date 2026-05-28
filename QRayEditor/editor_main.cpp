@@ -1,4 +1,4 @@
-#include "editor_window.h"
+#include "editor_window.hpp"
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow)
 {

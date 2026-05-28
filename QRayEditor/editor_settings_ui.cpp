@@ -2,8 +2,8 @@
 #include <windows.h>
 #include <string>
 
-#include "editor_settings_ui.h"
-#include "config.h"
+#include "editor_settings_ui.hpp"
+#include "config.hpp"
 
 static GameConfig* gConfig = nullptr;
 

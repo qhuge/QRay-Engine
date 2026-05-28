@@ -138,20 +138,20 @@
     <ClCompile Include="editor_main.cpp" />
     <ClCompile Include="editor_map.cpp" />
     <ClCompile Include="editor_renderer.cpp" />
-    <ClCompile Include="editor_renderer.h" />
+    <ClCompile Include="editor_renderer.hpp" />
     <ClCompile Include="editor_settings_ui.cpp" />
     <ClCompile Include="editor_viewport.cpp" />
     <ClCompile Include="editor_window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="build.h" />
-    <ClInclude Include="config.h" />
-    <ClInclude Include="editor_add_block_ui.h" />
-    <ClInclude Include="editor_helpers.h" />
-    <ClInclude Include="editor_map.h" />
-    <ClInclude Include="editor_settings_ui.h" />
-    <ClInclude Include="editor_viewport.h" />
-    <ClInclude Include="editor_window.h" />
+    <ClInclude Include="build.hpp" />
+    <ClInclude Include="config.hpp" />
+    <ClInclude Include="editor_add_block_ui.hpp" />
+    <ClInclude Include="editor_helpers.hpp" />
+    <ClInclude Include="editor_map.hpp" />
+    <ClInclude Include="editor_settings_ui.hpp" />
+    <ClInclude Include="editor_viewport.hpp" />
+    <ClInclude Include="editor_window.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

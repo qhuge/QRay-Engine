@@ -1,15 +1,17 @@
 #define NOMINMAX
 
-#include "editor_window.h"
-#include "editor_renderer.h"
-#include "editor_map.h"
+#include "editor_window.hpp"
+#include "editor_renderer.hpp"
+#include "editor_map.hpp"
 #include <string>
-#include "editor_helpers.h"
-#include "build.h"
-#include "editor_settings_ui.h"
-#include "config.h"
-#include "editor_viewport.h"
-#include "editor_add_block_ui.h"
+#include "editor_helpers.hpp"
+#include "build.hpp"
+#include "editor_settings_ui.hpp"
+#include "config.hpp"
+#include "editor_viewport.hpp"
+#include "editor_add_block_ui.hpp"
+#include <ctime>
+
 
 #define ID_FILE_SAVE 1001
 #define ID_FILE_LOAD 1002
@@ -29,6 +31,12 @@ static HWND gBlockLabel = nullptr;
 
 void RefreshBlockList()
 {
+    int currentSelection = (int)SendMessageW(gBlockList, LB_GETCURSEL, 0, 0);
+
+    if (currentSelection == LB_ERR) {
+        currentSelection = 0;
+    }
+
     SendMessageW(gBlockList, LB_RESETCONTENT, 0, 0);
 
     for (const BlockType& block : gBlockTypes)
@@ -44,11 +52,13 @@ void RefreshBlockList()
         0,
         (LPARAM)L"Spawnpoint");
 
-    SendMessageW(gBlockList, LB_SETCURSEL, 0, 0);
+    SendMessageW(gBlockList, LB_SETCURSEL, currentSelection, 0);
 }
 
 bool InitEditorWindow(EditorState& editor, HINSTANCE hInstance, int nCmdShow)
 {
+    srand(time(0));
+
     gEditor = &editor;
 
     WNDCLASSW wc = {};
@@ -267,14 +277,21 @@ LRESULT CALLBACK EditorWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
             case ID_FILE_BUILD:
             {
                 if (!hasSelectedSpawnPoint) {
-                    MessageBoxW(hWnd, L"No spawnpoint chosen. Choose a spawnpoint before building the game!", L"OK", MB_OK);
+                    MessageBoxW(hWnd, L"No spawnpoint chosen. Choose a spawnpoint before building the game!", L"Build failed", MB_OK);
                     break;
                 }
+
                 std::string buildLocation = SelectFolder();
                 if (buildLocation.length() == 0) {
-                    MessageBoxW(hWnd, L"Invalid build path", L"OK", MB_OK);
+                    MessageBoxW(hWnd, L"Invalid build path", L"Build failed", MB_OK);
                     break;
                 }
+                
+                if (!fileExists(GetExecutableDirectory() + "\\QRayRuntime.exe")) {
+                    MessageBoxW(hWnd, L"No runtime found. Ensure the runtime is at the same folder as this editor and named 'QRayRuntime.exe'", L"Build failed", MB_OK);
+                    break;
+                }
+
                 build(buildLocation);
                 break;
             }

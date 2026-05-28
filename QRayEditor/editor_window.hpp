@@ -4,7 +4,7 @@
 
 #include <windows.h>
 
-#include "config.h"
+#include "config.hpp"
 
 void RefreshBlockList();
 

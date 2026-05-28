@@ -8,9 +8,9 @@
 #include <fstream>
 #include <algorithm>
 
-#include "config.h"
-#include "build.h"
-#include "editor_map.h";
+#include "config.hpp"
+#include "build.hpp"
+#include "editor_map.hpp";
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -107,7 +107,7 @@ void build(std::string path) {
 	int amountOfSkippedTextures = 0;
 	std::vector<Tile> newMap = worldMap;
 	for (int i = 0; i < gBlockTypes.size(); i++) {
-		BlockType currentBlockType = gBlockTypes[i];
+		BlockType& currentBlockType = gBlockTypes[i];
 		if (currentBlockType.timesUsed > 0) {
 			ConvertPngToQRayAsset(currentBlockType.texturePath, (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedTextures) + ".qrayasset"));
 		}

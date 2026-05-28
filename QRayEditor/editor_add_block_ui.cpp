@@ -5,9 +5,12 @@
 
 #include <string>
 
-#include "editor_add_block_ui.h"
-#include "editor_map.h"
-#include "editor_window.h"
+#include "editor_add_block_ui.hpp"
+#include "editor_map.hpp"
+#include "editor_window.hpp"
+
+#include "editor_helpers.hpp"
+#include <stb_image.h>
 
 #define ID_NAME_EDIT     1001
 #define ID_TEXTURE_EDIT  1002
@@ -143,6 +146,10 @@ LRESULT CALLBACK AddBlockWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
                     block.name = name;
                     block.texturePath = texturePath;
+
+                    block.colorR = (rand() % 236) + 20;
+                    block.colorG = (rand() % 236) + 20;
+                    block.colorB = (rand() % 236) + 20;
 
                     gBlockTypes.push_back(block);
 
