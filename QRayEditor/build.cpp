@@ -178,6 +178,8 @@ void build(std::string path) {
 	cfg.WINDOW_WIDTH = save.resolutionX;
 	strcpy_s(cfg.title, save.gameTitle);
 	cfg.entityAmount = amountOfEntityAssets;
+	cfg.renderDistance = save.renderDistance;
+	cfg.angleOffset = save.startingAngle;
 
 	//write map file
 	WriteMap(buildFolder, newMap, newEnt, cfg);

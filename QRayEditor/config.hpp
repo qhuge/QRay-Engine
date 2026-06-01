@@ -10,13 +10,13 @@ struct GameConfig {
 
 	float playerY;
 
-	int renderDistance = 30;
+	int renderDistance;
 
 	int WINDOW_WIDTH;
 
 	int WINDOW_HEIGHT;
 
-	float angleOffset = 90.0f;
+	float angleOffset;
 
 	float moveSpeed = 3.0f;
 
@@ -40,6 +40,8 @@ struct ProjectFile
 
 	int resolutionX = 640;
 	int resolutionY = 400;
+	int startingAngle = -90;
+	int renderDistance = 30;
 
 	bool hasPlacedSpawnpoint = false;
 

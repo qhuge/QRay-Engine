@@ -157,6 +157,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="editor_popups_error.hpp" />
+    <ClCompile Include="editor_popups_settings.cpp" />
     <ClCompile Include="editor_startup.cpp" />
     <ClCompile Include="editor_viewport.cpp" />
     <ClCompile Include="main.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="editor_main.hpp" />
     <ClInclude Include="editor_popups_add_entity.hpp" />
     <ClInclude Include="editor_popups_add_tile.hpp" />
+    <ClInclude Include="editor_popups_settings.hpp" />
     <ClInclude Include="editor_startup.hpp" />
     <ClInclude Include="editor_viewport.hpp" />
     <ClInclude Include="world.hpp" />

@@ -63,6 +63,9 @@
     <ClCompile Include="editor_startup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="editor_popups_settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_main.hpp">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="editor_popups_add_entity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_popups_settings.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,11 +16,15 @@ A WIP raycasting game engine.
 
 6. Select a tile or entity from the list and left-click on the grid to place it there. Use right-click to remove tiles and entities.
 
-7. You can build the game by going File -> Build, and choosing a location to build.
+7. You can change the game title from Settings -> Project settings.
+
+8. You can build the game by going File -> Build, and choosing a location to build.
 
 ## Latest features
 
 You can now save and load editor projects!
+
+This repo also features an example project, and the game built from that. Also there's some textures for experimenting!
 
 ## TODO
 
@@ -32,7 +36,6 @@ Here's a list of features that I consider are needed before I can release the fi
 - Some kind of ui support
 - Weapons
 - Better visualizing of the map in the editor
-- Changing the game title (as there isnt a settings menu yet, the game title and resolution are locked)
 
 Things below are not necessarily needed but would be nice to have
 

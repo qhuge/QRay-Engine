@@ -18,6 +18,7 @@
 #include "build.hpp"
 #include "editor_popups_error.hpp"
 #include "editor_popups_add_entity.hpp"
+#include "editor_popups_settings.hpp"
 
 // --------------------
 // Globals (minimal)
@@ -178,6 +179,7 @@ int RunEditorLoop()
         DrawAddTilePopup();
         DrawErrorPopup();
         DrawAddEntityPopup();
+        DrawSettingsPopup();
 
 
 
@@ -332,8 +334,6 @@ int RunEditorLoop()
                                 ShowError("Build failed", "Invalid build path");
                             }
                         }
-                        
-                        
                     }
 
                     ImGui::Separator();
@@ -344,6 +344,16 @@ int RunEditorLoop()
                     }
 
                     ImGui::EndMenu();
+                }
+
+                if (ImGui::BeginMenu("Settings")) {
+
+                    if (ImGui::MenuItem("Project settings")) {
+                        OpenSettingsPopup();
+                    }
+
+                    ImGui::EndMenu();
+
                 }
 
                 ImGui::EndMainMenuBar();
