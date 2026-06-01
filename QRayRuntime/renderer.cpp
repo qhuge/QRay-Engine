@@ -13,6 +13,8 @@
 #include "types.hpp"
 #include "entity_rendering.hpp"
 
+const float playerRadius = 0.2f;
+
 std::vector<float> gDepthBuffer;
 
 void Render(Framebuffer framebuffer)
@@ -79,8 +81,18 @@ void Render(Framebuffer framebuffer)
         moveY /= length;
     }
 
-    cfg.playerX += moveX * moveSpeedNow * deltaTime;
-    cfg.playerY += moveY * moveSpeedNow * deltaTime;
+    float newX = cfg.playerX + moveX * moveSpeedNow * deltaTime;
+    float newY = cfg.playerY + moveY * moveSpeedNow * deltaTime;
+
+    if (CanMoveTo(newX, cfg.playerY))
+    {
+        cfg.playerX = newX;
+    }
+
+    if (CanMoveTo(cfg.playerX, newY))
+    {
+        cfg.playerY = newY;
+    }
 
     // =========================================
     // ROTATION

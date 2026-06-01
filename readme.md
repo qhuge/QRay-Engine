@@ -36,7 +36,7 @@ Here's a list of features that I consider are needed before I can release the fi
 - Some kind of ui support
 - Weapons
 - Better visualizing of the map in the editor
-- Player collisions
+- Entity collisions
 
 Things below are not necessarily needed but would be nice to have
 

@@ -59,6 +59,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         return 0;
     }
 
+    cfg.playerY -= 10;
+
     Win32State win32 = {};
 
     gWin32 = &win32;

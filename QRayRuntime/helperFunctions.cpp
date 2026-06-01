@@ -61,3 +61,33 @@ bool PlayerBetweenDoor(const Tile& doorTile1, const Tile& doorTile2)
         return false;
     }
 }
+
+bool IsWallAt(float x, float y)
+{
+    int wall = FindWall((int)floorf(x), (int)floorf(y));
+
+    if (wall == -1) {
+        return false;
+    }
+    else {
+        Tile t = worldWalls[wall];
+        if (!t.isDoor) {
+            return true;
+        }
+        if (t.door.open >= 0.8f) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CanMoveTo(float x, float y)
+{
+    const float r = 0.2f;
+
+    return
+        !IsWallAt(x - r, y - r) &&
+        !IsWallAt(x + r, y - r) &&
+        !IsWallAt(x - r, y + r) &&
+        !IsWallAt(x + r, y + r);
+}

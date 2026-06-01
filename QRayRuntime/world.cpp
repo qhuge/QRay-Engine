@@ -82,6 +82,8 @@ bool LoadWorld(const char* filename)
             ss >> doorDir >> doorFace;
 
             tile.isDoor = true;
+
+            //THIS MEANS DIRECTION OF THE INDIVIUAL DOOR NOT THE 2 DOOR TILES TOGETHER (IF BOTH TILES HAVE SAME Y THEN DIR = HORIZONTAL)
             switch (doorDir)
             {
                 case 0: tile.door.dir = Axis::Horizontal; break;
