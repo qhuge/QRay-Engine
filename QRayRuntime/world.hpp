@@ -5,13 +5,38 @@
 #include "types.hpp"
 #include "config.hpp"
 
+enum class Direction
+{
+    Up,
+    Right,
+    Down,
+    Left
+};
 
+enum class Axis
+{
+    Horizontal,
+    Vertical
+};
+
+struct Door
+{
+    float open = 0.0f; //0 = closed, 1 = open
+    Axis dir;
+    Direction renderedFace;
+    bool targetOpen = false;
+    float openTimer = 0.0f;
+    int indexOfOtherDoorTile;
+};
 
 struct Tile
 {
     int x;
     int y;
     int textureIndex;
+
+    bool isDoor = false;
+    Door door;
 };
 
 struct Entity
@@ -32,4 +57,5 @@ extern std::vector<Entity> worldEntities;
 bool LoadWorld(const char* filename);
 
 Texture LoadQRayAsset(std::string path);
+
 EntityType LoadQRayEntity(std::string path);

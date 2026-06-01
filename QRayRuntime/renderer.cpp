@@ -10,6 +10,8 @@
 #include "helperFunctions.hpp"
 #include "window_win32.hpp"
 #include "world.hpp"
+#include "types.hpp"
+#include "entity_rendering.hpp"
 
 std::vector<float> gDepthBuffer;
 
@@ -126,6 +128,24 @@ void Render(Framebuffer framebuffer)
         float rayAngle = cfg.angleOffset - (cfg.FOV / 2.0f) + ((float)x / framebuffer.width) * cfg.FOV;
 
         RayHit hit = CastRay(cfg.playerX, cfg.playerY, rayAngle);
+
+        if (GetAsyncKeyState('E') & 0x8000)
+        {
+            if (hit.distance > 0.0f && hit.distance < 1.5f)
+            {
+                Tile& tile = worldWalls[hit.tileIndex];
+
+                if (tile.isDoor)
+                {
+                    tile.door.targetOpen = true;
+                    tile.door.openTimer = 5.0f;
+
+                    worldWalls[tile.door.indexOfOtherDoorTile].door.targetOpen = true;
+                    worldWalls[tile.door.indexOfOtherDoorTile].door.openTimer = 5.0f;
+                }
+            }
+        }
+
 
         if (hit.distance > 0.0f)
         {

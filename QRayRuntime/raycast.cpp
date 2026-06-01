@@ -1,4 +1,4 @@
-#define _USE_MATH_DEFINES
+﻿#define _USE_MATH_DEFINES
 
 #include "raycast.hpp"
 #include "config.hpp"
@@ -109,39 +109,123 @@ RayHit CastRay(float posX, float posY, float angleDeg)
         if (WallIndex == -1)
             continue;
 
-        hit = true;
-
         float perpWallDist;
+
+        
+
+        hit = true;
 
         if (side == 0)
         {
-            perpWallDist =
-                (mapX - posX + (1 - stepX) * 0.5f)
-                / rayDirX;
+            perpWallDist = (mapX - posX + (1 - stepX) * 0.5f) / rayDirX;
         }
         else
         {
-            perpWallDist =
-                (mapY - posY + (1 - stepY) * 0.5f)
-                / rayDirY;
+            perpWallDist = (mapY - posY + (1 - stepY) * 0.5f) / rayDirY;
         }
 
         float wallHit;
 
         if (side == 0)
         {
-            wallHit =
-                posY + perpWallDist * rayDirY;
+            wallHit = posY + perpWallDist * rayDirY;
         }
         else
         {
-            wallHit =
-                posX + perpWallDist * rayDirX;
+            wallHit = posX + perpWallDist * rayDirX;
         }
 
+        Tile& tile = worldWalls[WallIndex];
+
         // Fractional part
-        float textureX =
-            wallHit - std::floor(wallHit);
+        float textureX = wallHit - std::floor(wallHit);
+
+        if (tile.isDoor)
+        {
+            //These are inverted due to the fact that they refer to the DOOR direction and not the 2 door tiles direction
+            bool isVerticalDoor = (tile.door.dir != Axis::Vertical);   // Up/Down axis
+            bool isHorizontalDoor = (tile.door.dir != Axis::Horizontal); // Left/Right axis
+
+            bool validDoorSide = false;
+
+            // -------------------------
+            // VERTICAL DOOR (Up/Down)
+            // -------------------------
+            if (isVerticalDoor)
+            {
+                if (side == 0) // only process vertical wall hits
+                {
+                    bool isLeftTile = (tile.door.renderedFace == Direction::Left);
+                    bool isRightTile = (tile.door.renderedFace == Direction::Right);
+
+                    bool rayOnLeftSide = (posX < mapX);
+                    bool rayOnRightSide = (posX > mapX);
+
+                    validDoorSide =
+                        (isLeftTile && rayOnLeftSide) ||
+                        (isRightTile && rayOnRightSide);
+
+                    if (validDoorSide)
+                    {
+                        float cutoff = tile.door.open;
+
+                        if (textureX < cutoff)
+                        {
+                            hit = false;
+                            continue;
+                        }
+
+                        textureX -= cutoff;
+                    }
+                    else
+                    {
+                        hit = false;
+                        continue;
+                    }
+                }
+            }
+
+            // -------------------------
+            // HORIZONTAL DOOR (Left/Right)
+            // -------------------------
+            else if (isHorizontalDoor)
+            {
+                if (side == 1) // only process horizontal wall hits
+                {
+                    bool isTopTile = (tile.door.renderedFace == Direction::Up);
+                    bool isBottomTile = (tile.door.renderedFace == Direction::Down);
+
+                    bool rayOnTopSide = (posY < mapY);
+                    bool rayOnBottomSide = (posY > mapY);
+
+                    validDoorSide =
+                        (isTopTile && rayOnTopSide) ||
+                        (isBottomTile && rayOnBottomSide);
+
+                    if (validDoorSide)
+                    {
+                        float cutoff = tile.door.open;
+
+                        if (textureX < cutoff)
+                        {
+                            hit = false;
+                            continue;
+                        }
+
+                        textureX -= cutoff;
+                    }
+                    else
+                    {
+                        hit = false;
+                        continue;
+                    }
+                }
+            }
+        }
+
+        
+
+        
 
         //Ambient occlusion
 
@@ -203,8 +287,9 @@ RayHit CastRay(float posX, float posY, float angleDeg)
             perpWallDist,
             textureX,
             ambient,
-            wallTextureIndex);
+            wallTextureIndex,
+            WallIndex);
     }
 
-    return RayHit(-1.0f, 0.0f, 0.0f, 0);
+    return RayHit(-1.0f, 0.0f, 0.0f, 0, 0);
 }

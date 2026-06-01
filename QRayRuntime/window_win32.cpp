@@ -6,6 +6,7 @@
 #include "renderer.hpp"
 #include "world.hpp"
 #include <string>
+#include "helperFunctions.hpp"
 
 static auto lastTime = std::chrono::high_resolution_clock::now();
 
@@ -53,19 +54,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         gEntityTypes.push_back(entity);
     }
 
-    LoadWorld("map.txt");
-
-    Entity debugEntity;
-    debugEntity.x = 12.0f;
-    debugEntity.y = 10.0f;
-    debugEntity.textureIndex = 1;
-    worldEntities.push_back(debugEntity);
-
-    Entity debugEntity2;
-    debugEntity2.x = 11.0f;
-    debugEntity2.y = 11.0f;
-    debugEntity2.textureIndex = 0;
-    worldEntities.push_back(debugEntity2);
+    bool worldSuccess = LoadWorld("map.txt");
+    if (!worldSuccess) {
+        return 0;
+    }
 
     Win32State win32 = {};
 
@@ -150,6 +142,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             std::string title = narrowTitle + " - FPS: " + std::to_string((int)fps);
 
             SetWindowTextA(win32.hWnd, title.c_str());
+        }
+
+        //DOOR ANIMATIONS:
+        const float doorSpeed = 1.0f; // open/close speed
+
+        for (Tile& tile : worldWalls)
+        {
+            if (!tile.isDoor)
+                continue;
+
+            Door& door = tile.door;
+
+            if (door.targetOpen)
+            {
+                door.openTimer -= deltaTime;
+
+                if (!PlayerBetweenDoor(tile, worldWalls[tile.door.indexOfOtherDoorTile])) {
+                    if (door.openTimer <= 0.0f)
+                    {
+                        door.openTimer = 0.0f;
+                        door.targetOpen = false; // auto-close trigger
+                    }
+                }
+                
+            }
+
+            float direction = door.targetOpen ? 1.0f : -1.0f;
+
+            door.open += direction * doorSpeed * deltaTime;
+
+            if (door.open > 1.0f)
+                door.open = 1.0f;
+
+            if (door.open < 0.0f)
+                door.open = 0.0f;
         }
 
         // Render frame

@@ -3,7 +3,7 @@
 #include "helperFunctions.hpp"
 #include <cmath>
 #include "config.hpp"
-#include "renderer.hpp"
+#include "entity_rendering.hpp"
 
 float CalcColorMult(float distance)
 {
@@ -47,4 +47,17 @@ int clampInt(int a, int max) {
 bool compareDistance(const EntityToRender& a, const EntityToRender& b)
 {
     return a.d > b.d;
+}
+
+bool PlayerBetweenDoor(const Tile& doorTile1, const Tile& doorTile2)
+{
+    if (cfg.playerX > doorTile1.x && cfg.playerX < (doorTile1.x + 1) && cfg.playerY > doorTile1.y && cfg.playerY < (doorTile1.y + 1)) {
+        return true;
+    }
+    else if (cfg.playerX > doorTile2.x && cfg.playerX < (doorTile2.x + 1) && cfg.playerY > doorTile2.y && cfg.playerY < (doorTile2.y + 1)) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }

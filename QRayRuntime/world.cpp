@@ -3,15 +3,6 @@
 #include <sstream>
 #include <string>
 
-//const std::vector<Tile> worldWalls =
-//{
-//    {100,104, 0},
-//    {101,105, 0},
-//    {99,105, 0},
-//    {99,103, 0},
-//    {101,103, 0},
-//};
-
 std::vector<Tile> worldWalls;
 
 std::vector<Entity> worldEntities;
@@ -80,6 +71,37 @@ bool LoadWorld(const char* filename)
             worldEntities.push_back(entity);
             break;
         }
+        case 'D':
+        {
+            Tile tile;
+            ss >> tile.x >> tile.y >> tile.textureIndex;
+
+            int doorDir;
+            int doorFace;
+
+            ss >> doorDir >> doorFace;
+
+            tile.isDoor = true;
+            switch (doorDir)
+            {
+                case 0: tile.door.dir = Axis::Horizontal; break;
+                case 1: tile.door.dir = Axis::Vertical; break;
+                default: return false;
+            }
+
+            switch (doorFace)
+            {
+                case 0: tile.door.renderedFace = Direction::Up; break;
+                case 1: tile.door.renderedFace = Direction::Right; break;
+                case 2: tile.door.renderedFace = Direction::Down; break;
+                case 3: tile.door.renderedFace = Direction::Left; break;
+                default: return false;
+            }
+            tile.door.open = 0.0f;
+
+            worldWalls.push_back(tile);
+            break;
+        }
 
         //TODO spawn based on map file:
         /*case 'S':
@@ -89,8 +111,56 @@ bool LoadWorld(const char* filename)
         }*/
 
         default:
-            // Unknown line type
-            break;
+            return false;
+        }
+    }
+
+    //set door indexes
+    for (int i = 0; i < worldWalls.size(); i++) {
+        Tile& tile = worldWalls[i];
+
+        if (!tile.isDoor) {
+            continue;
+        } 
+
+        if (tile.door.dir == Axis::Horizontal) {
+            if (tile.door.renderedFace == Direction::Right) {
+                int indexOfNeighbor = FindWall(tile.x + 1, tile.y);
+                if (indexOfNeighbor != -1) {
+                    tile.door.indexOfOtherDoorTile = indexOfNeighbor;
+                }
+                else {
+                    return false;
+                }
+            } else if (tile.door.renderedFace == Direction::Left) {
+                int indexOfNeighbor = FindWall(tile.x - 1, tile.y);
+                if (indexOfNeighbor != -1) {
+                    tile.door.indexOfOtherDoorTile = indexOfNeighbor;
+                }
+                else {
+                    return false;
+                }
+            } else { return false; }
+        } else if (tile.door.dir == Axis::Vertical) {
+            if (tile.door.renderedFace == Direction::Up) {
+                int indexOfNeighbor = FindWall(tile.x, tile.y - 1);
+                if (indexOfNeighbor != -1) {
+                    tile.door.indexOfOtherDoorTile = indexOfNeighbor;
+                }
+                else {
+                    return false;
+                }
+            }
+            else if (tile.door.renderedFace == Direction::Down) {
+                int indexOfNeighbor = FindWall(tile.x, tile.y + 1);
+                if (indexOfNeighbor != -1) {
+                    tile.door.indexOfOtherDoorTile = indexOfNeighbor;
+                }
+                else {
+                    return false;
+                }
+            }
+            else { return false; }
         }
     }
 

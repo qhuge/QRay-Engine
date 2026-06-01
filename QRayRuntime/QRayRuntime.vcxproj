@@ -140,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.hpp" />
+    <ClInclude Include="entity_rendering.hpp" />
     <ClInclude Include="helperFunctions.hpp" />
     <ClInclude Include="raycast.hpp" />
     <ClInclude Include="renderer.hpp" />

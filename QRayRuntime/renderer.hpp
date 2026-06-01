@@ -15,10 +15,3 @@ struct Framebuffer
 extern std::vector<float> gDepthBuffer;
 
 void Render(Framebuffer framebuffer);
-
-struct EntityToRender
-{
-    Entity* e;
-    float d;
-    float a;
-};
