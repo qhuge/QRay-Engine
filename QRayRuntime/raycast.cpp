@@ -1,9 +1,9 @@
 #define _USE_MATH_DEFINES
 
-#include "raycast.h"
-#include "config.h"
-#include "helperFunctions.h"
-#include "world.h"
+#include "raycast.hpp"
+#include "config.hpp"
+#include "helperFunctions.hpp"
+#include "world.hpp"
 #include <cmath>
 
 RayHit CastRay(float posX, float posY, float angleDeg)

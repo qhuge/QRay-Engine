@@ -10,7 +10,6 @@
 
 #include "config.hpp"
 #include "build.hpp"
-#include "editor_map.hpp";
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -28,18 +27,29 @@ std::string GetExecutableDirectory()
 	return fullPath.substr(0, slash);
 }
 
-void WriteMap(std::string buildFolder, std::vector<Tile> mapToWrite) {
+void WriteMap(std::string buildFolder, std::vector<Tile> tiles, std::vector<Entity> ents, GameConfig& cfg) {
 	std::ofstream outfile(buildFolder + "\\map.txt");
 
-	for (int i = 0; i < mapToWrite.size(); i++) {
-		Tile currentTile = mapToWrite[i];
-		
+	for (int i = 0; i < tiles.size(); i++) {
+		Tile& currentTile = tiles[i];
+
 		//-1 means its the spawnpoint. dont write that to the actual map.
-		if (currentTile.textureIndex != -1) {
-			std::string newString = std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " " + std::to_string(currentTile.textureIndex);
+		if (currentTile.tileTypeIndex != -1) {
+			std::string newString = "T " + std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " " + std::to_string(currentTile.tileTypeIndex);
 
 			outfile << newString << std::endl;
 		}
+		else {
+			cfg.playerX = currentTile.x + 0.5f;
+			cfg.playerY = currentTile.y + 0.5f;
+		}
+	}
+
+	for (int i = 0; i < ents.size(); i++) {
+		Entity& currentEntity = ents[i];
+		std::string newString = "E " + std::to_string(currentEntity.x) + " " + std::to_string(currentEntity.y) + " " + std::to_string(currentEntity.entityTypeIndex + (cfg.textureAmount - cfg.entityAmount));
+
+		outfile << newString << std::endl;
 	}
 
 	outfile.close();
@@ -80,11 +90,29 @@ bool ConvertPngToQRayAsset(const std::string& inputPng, const std::string& outpu
 	return true;
 };
 
+void WriteEntityFile(const EntityType& ent, std::string path)
+{
+	EntityTypeRuntime entr;
+	entr.health = ent.health;
+	entr.idleMovement = ent.idleMovement;
+	entr.losMovement = ent.losMovement;
+	entr.tag = ent.tag;
+
+	std::ofstream file(path, std::ios::binary);
+
+	file.write((char*)&entr, sizeof(EntityTypeRuntime));
+
+	file.close();
+}
+
 void build(std::string path) {
 	OutputDebugStringA("BUILD STARTED\n");
 
+	//make new cfg
+	GameConfig cfg;
+
 	//convert title to string
-	std::string title = cfg.title;
+	std::string title = save.gameTitle;
 
 	//spaces to underscores for file names:
 	std::replace(title.begin(), title.end(), ' ', '_');
@@ -93,7 +121,7 @@ void build(std::string path) {
 	std::string buildFolder = path + "\\" + title;
 
 	//create a folder for the build and then create assets folder.
-	CreateDirectoryA(buildFolder.c_str(),nullptr);
+	CreateDirectoryA(buildFolder.c_str(), nullptr);
 	CreateDirectoryA((buildFolder + "\\assets").c_str(), nullptr);
 
 	//copy runtime and rename it
@@ -104,31 +132,55 @@ void build(std::string path) {
 
 	//converting and writing textures (make a new list of tiles that have correct texture indexes.)
 	//we dont want to modify the actual world map, since that might get edited and built again
-	int amountOfSkippedTextures = 0;
-	std::vector<Tile> newMap = worldMap;
-	for (int i = 0; i < gBlockTypes.size(); i++) {
-		BlockType& currentBlockType = gBlockTypes[i];
-		if (currentBlockType.timesUsed > 0) {
-			ConvertPngToQRayAsset(currentBlockType.texturePath, (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedTextures) + ".qrayasset"));
+	int amountOfSkippedTiles = 0;
+	std::vector<Tile> newMap = save.tiles;
+	for (int i = 0; i < save.tileTypes.size(); i++) {
+		TileType& currentTileType = save.tileTypes[i];
+		if (currentTileType.timesUsed > 0) {
+			ConvertPngToQRayAsset((saveLocation + "\\" + currentTileType.texturePath), (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedTiles) + ".qrayasset"));
 		}
 		else {
-			//if we skip a texture we must 
+			//if we skip a texture we must not then build that
 			for (int f = 0; f < newMap.size(); f++) {
 				Tile& currentTile = newMap[f];
-				if (currentTile.textureIndex >= i) {
-					currentTile.textureIndex--;
+				if (currentTile.tileTypeIndex >= i) {
+					currentTile.tileTypeIndex--;
 				}
 			}
 
-			amountOfSkippedTextures++;
+			amountOfSkippedTiles++;
 		}
 	}
+	int amountOfTileAssets = save.tileTypes.size() - amountOfSkippedTiles;
+	int amountOfSkippedEntities = 0;
+	std::vector<Entity> newEnt = save.entities;
+	for (int i = 0; i < save.entityTypes.size(); i++) {
+		EntityType& currentEntityType = save.entityTypes[i];
+		if (currentEntityType.timesUsed > 0) {
+			ConvertPngToQRayAsset((saveLocation + "\\" + currentEntityType.texturePath), (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedEntities + amountOfTileAssets) + ".qrayasset"));
+			WriteEntityFile(currentEntityType, (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedEntities + amountOfTileAssets) + ".qrayentity"));
+		}
+		else {
+			for (int f = 0; f < newEnt.size(); f++) {
+				Entity& currentEntity = newEnt[f];
+				if (currentEntity.entityTypeIndex >= i) {
+					currentEntity.entityTypeIndex--;
+				}
+			}
 
-	
-	cfg.textureAmount = gBlockTypes.size() - amountOfSkippedTextures;
+			amountOfSkippedEntities++;
+		}
+	}
+	int amountOfEntityAssets = save.entityTypes.size() - amountOfSkippedEntities;
+
+	cfg.textureAmount = amountOfTileAssets + amountOfEntityAssets;
+	cfg.WINDOW_HEIGHT = save.resolutionY;
+	cfg.WINDOW_WIDTH = save.resolutionX;
+	strcpy_s(cfg.title, save.gameTitle);
+	cfg.entityAmount = amountOfEntityAssets;
 
 	//write map file
-	WriteMap(buildFolder, newMap);
+	WriteMap(buildFolder, newMap, newEnt, cfg);
 
 	//write data file
 	WriteData(cfg, buildFolder);

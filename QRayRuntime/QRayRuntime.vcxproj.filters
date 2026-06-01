@@ -35,25 +35,28 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.h">
+    <ClInclude Include="config.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="helperFunctions.h">
+    <ClInclude Include="helperFunctions.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="raycast.h">
+    <ClInclude Include="raycast.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="renderer.h">
+    <ClInclude Include="renderer.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="window_win32.h">
+    <ClInclude Include="window_win32.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="world.h">
+    <ClInclude Include="world.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="types.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

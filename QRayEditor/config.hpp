@@ -1,32 +1,20 @@
 #pragma once
-
-#include <windows.h>
-
-#include <string>
 #include <vector>
-
-static const int WINDOW_WIDTH = 1280;
-static const int WINDOW_HEIGHT = 720;
-
-static const int TILE_SIZE = 32;
-
-static const int MAP_WIDTH = 50;
-static const int MAP_HEIGHT = 50;
-
-static const std::string RUNTIME_PATH = "QRayRuntime.exe";
+#include "world.hpp"
+#include <string>
 
 struct GameConfig {
-	char title[64] = "Example Game";
+	char title[64]{ "Example Game" };
 
-	float playerX = 0.0f;
+	float playerX;
 
-	float playerY = 0.0f;
+	float playerY;
 
 	int renderDistance = 30;
 
-	int WINDOW_WIDTH = 640;
+	int WINDOW_WIDTH;
 
-	int WINDOW_HEIGHT = 400;
+	int WINDOW_HEIGHT;
 
 	float angleOffset = 90.0f;
 
@@ -40,29 +28,42 @@ struct GameConfig {
 
 	float FOV = 80.0f;
 
-	int textureAmount = 0;
+	uint16_t textureAmount;
+
+	int entityAmount;
 };
 
-struct QRayTextureAssetHeader
+struct ProjectFile
 {
-	uint32_t width;
-	uint32_t height;
-	uint32_t channels;
+	char gameTitle[64]{ "Example Game" };
+	char projectTitle[64]{ "Example Project" };
+
+	int resolutionX = 640;
+	int resolutionY = 400;
+
+	bool hasPlacedSpawnpoint = false;
+
+	std::vector<Tile> tiles;
+	std::vector<Entity> entities;
+
+	std::vector<TileType> tileTypes;
+	std::vector<EntityType> entityTypes;
 };
 
-extern GameConfig cfg;
+inline ProjectFile save;
 
-struct BlockType
+inline std::string saveLocation;
+
+enum class EditorState
 {
-	std::string name;
-
-	std::string texturePath;
-
-	int colorR = 220;
-	int colorG = 220;
-	int colorB = 220;
-
-	int timesUsed = 0;
+	Startup,
+	Editing
 };
 
-extern std::vector<BlockType> gBlockTypes;
+inline EditorState gEditorState = EditorState::Startup;
+
+enum class EditorCreateMode {
+	Tile,
+	Entity,
+	Spawnpoint
+};

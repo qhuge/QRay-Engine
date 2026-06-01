@@ -1,8 +1,9 @@
 #define _USE_MATH_DEFINES
 
-#include "helperFunctions.h"
+#include "helperFunctions.hpp"
 #include <cmath>
-#include "config.h"
+#include "config.hpp"
+#include "renderer.hpp"
 
 float CalcColorMult(float distance)
 {
@@ -41,4 +42,9 @@ int clampInt(int a, int max) {
         a = max;
     }
     return a;
+}
+
+bool compareDistance(const EntityToRender& a, const EntityToRender& b)
+{
+    return a.d > b.d;
 }

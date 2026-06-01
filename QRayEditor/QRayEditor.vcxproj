@@ -76,11 +76,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)external</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external; $(SolutionDir)external/ImGui; $(SolutionDir)external/ImGui/backends</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;dxgi.lib;d3dcompiler.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -91,13 +93,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)external</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external; $(SolutionDir)external/ImGui; $(SolutionDir)external/ImGui/backends</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;dxgi.lib;d3dcompiler.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -106,11 +110,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)external</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external; $(SolutionDir)external/ImGui; $(SolutionDir)external/ImGui/backends</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;dxgi.lib;d3dcompiler.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -121,37 +127,50 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)external</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external; $(SolutionDir)external/ImGui; $(SolutionDir)external/ImGui/backends</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;dxgi.lib;d3dcompiler.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\external\ImGui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="..\external\ImGui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\external\ImGui\imgui.cpp" />
+    <ClCompile Include="..\external\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="..\external\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="..\external\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="build.cpp" />
-    <ClCompile Include="config.cpp" />
-    <ClCompile Include="editor_add_block_ui.cpp" />
     <ClCompile Include="editor_helpers.cpp" />
     <ClCompile Include="editor_main.cpp" />
-    <ClCompile Include="editor_map.cpp" />
-    <ClCompile Include="editor_renderer.cpp" />
-    <ClCompile Include="editor_renderer.hpp" />
-    <ClCompile Include="editor_settings_ui.cpp" />
+    <ClCompile Include="editor_popups_add_entity.cpp" />
+    <ClCompile Include="editor_popups_add_tile.cpp" />
+    <ClCompile Include="editor_popups_error.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="editor_popups_error.hpp" />
+    <ClCompile Include="editor_startup.cpp" />
     <ClCompile Include="editor_viewport.cpp" />
-    <ClCompile Include="editor_window.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="build.hpp" />
     <ClInclude Include="config.hpp" />
-    <ClInclude Include="editor_add_block_ui.hpp" />
     <ClInclude Include="editor_helpers.hpp" />
-    <ClInclude Include="editor_map.hpp" />
-    <ClInclude Include="editor_settings_ui.hpp" />
+    <ClInclude Include="editor_main.hpp" />
+    <ClInclude Include="editor_popups_add_entity.hpp" />
+    <ClInclude Include="editor_popups_add_tile.hpp" />
+    <ClInclude Include="editor_startup.hpp" />
     <ClInclude Include="editor_viewport.hpp" />
-    <ClInclude Include="editor_window.hpp" />
+    <ClInclude Include="world.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

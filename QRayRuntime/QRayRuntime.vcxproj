@@ -139,13 +139,14 @@
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.h" />
-    <ClInclude Include="helperFunctions.h" />
-    <ClInclude Include="raycast.h" />
-    <ClInclude Include="renderer.h" />
+    <ClInclude Include="config.hpp" />
+    <ClInclude Include="helperFunctions.hpp" />
+    <ClInclude Include="raycast.hpp" />
+    <ClInclude Include="renderer.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="window_win32.h" />
-    <ClInclude Include="world.h" />
+    <ClInclude Include="types.hpp" />
+    <ClInclude Include="window_win32.hpp" />
+    <ClInclude Include="world.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources.rc" />

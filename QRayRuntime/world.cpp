@@ -1,5 +1,7 @@
-#include "world.h"
+#include "world.hpp"
 #include <fstream>
+#include <sstream>
+#include <string>
 
 //const std::vector<Tile> worldWalls =
 //{
@@ -12,10 +14,11 @@
 
 std::vector<Tile> worldWalls;
 
+std::vector<Entity> worldEntities;
+
 bool TileMatches(const Tile& tile, int x, int y)
 {
-    return tile.x == x &&
-        tile.y == y;
+    return tile.x == x && tile.y == y;
 }
 
 int FindWall(int x, int y)
@@ -34,19 +37,61 @@ int FindWall(int x, int y)
 bool LoadWorld(const char* filename)
 {
     worldWalls.clear();
+    worldEntities.clear();
 
     std::ifstream file(filename);
 
     if (!file.is_open())
-    {
         return false;
-    }
 
-    Tile tile;
+    std::string line;
 
-    while (file >> tile.x >> tile.y >> tile.textureIndex)
+    while (std::getline(file, line))
     {
-        worldWalls.push_back(tile);
+        if (line.empty())
+            continue;
+
+        std::stringstream ss(line);
+
+        char type;
+        ss >> type;
+
+        switch (type)
+        {
+        case 'T':
+        {
+            Tile tile;
+
+            ss >> tile.x >> tile.y >> tile.textureIndex;
+
+            worldWalls.push_back(tile);
+            break;
+        }
+
+        case 'E':
+        {
+            Entity entity;
+
+            ss >> entity.x >> entity.y >> entity.textureIndex;
+
+            entity.x += 0.5f;
+            entity.y += 0.5f;
+
+            worldEntities.push_back(entity);
+            break;
+        }
+
+        //TODO spawn based on map file:
+        /*case 'S':
+        {
+            ss >> spawnX >> spawnY;
+            break;
+        }*/
+
+        default:
+            // Unknown line type
+            break;
+        }
     }
 
     return true;
@@ -69,4 +114,17 @@ Texture LoadQRayAsset(std::string path)
     file.read((char*)tex.pixels.data(), size);
 
     return tex;
+}
+
+EntityType LoadQRayEntity(std::string path)
+{
+    std::ifstream file(path, std::ios::binary);
+
+    EntityType entityT;
+
+    file.read((char*)&entityT, sizeof(entityT));
+
+    file.close();
+
+    return entityT;
 }

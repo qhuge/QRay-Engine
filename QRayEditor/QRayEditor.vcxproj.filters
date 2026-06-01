@@ -18,61 +18,79 @@
     <ClCompile Include="editor_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="editor_map.cpp">
+    <ClCompile Include="..\external\ImGui\backends\imgui_impl_win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="editor_renderer.hpp">
+    <ClCompile Include="..\external\ImGui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="editor_renderer.cpp">
+    <ClCompile Include="..\external\ImGui\imgui_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="editor_window.cpp">
+    <ClCompile Include="..\external\ImGui\imgui_tables.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="build.cpp">
+    <ClCompile Include="..\external\ImGui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="editor_helpers.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="editor_settings_ui.cpp">
+    <ClCompile Include="..\external\ImGui\backends\imgui_impl_dx11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="editor_viewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="editor_add_block_ui.cpp">
+    <ClCompile Include="editor_helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_popups_add_tile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="build.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_popups_error.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_popups_add_entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_popups_error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_startup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="editor_window.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="editor_map.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="editor_helpers.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="editor_settings_ui.hpp">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="editor_main.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="editor_viewport.hpp">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="editor_add_block_ui.hpp">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="world.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_helpers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_startup.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_popups_add_tile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="build.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_popups_add_entity.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

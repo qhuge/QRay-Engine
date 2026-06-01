@@ -1,12 +1,11 @@
 #define NOMINMAX
 
-#include "window_win32.h"
-#include "config.h"
+#include "window_win32.hpp"
+#include "config.hpp"
 #include <cstdint>
-#include "renderer.h"
-#include "world.h"
+#include "renderer.hpp"
+#include "world.hpp"
 #include <string>
-#include <chrono>
 
 static auto lastTime = std::chrono::high_resolution_clock::now();
 
@@ -14,23 +13,22 @@ float deltaTime = 0.0f;
 
 static Win32State* gWin32 = nullptr;
 
-void ClearScreen(Win32State& win32, uint32_t color)
+void ClearScreen(Framebuffer framebuffer, uint32_t color)
 {
-    for (int i = 0; i < cfg.WINDOW_WIDTH * cfg.WINDOW_HEIGHT; i++)
+    for (int i = 0; i < framebuffer.width * framebuffer.height; i++)
     {
-        win32.pixels[i] = color;
+        framebuffer.pixels[i] = color;
     }
 }
 
-void PutPixel(Win32State& win32, int x, int y, uint32_t color)
+void PutPixel(Framebuffer framebuffer, int x, int y, uint32_t color)
 {
-    if (x < 0 || x >= cfg.WINDOW_WIDTH ||
-        y < 0 || y >= cfg.WINDOW_HEIGHT)
+    if (x < 0 || x >= framebuffer.width || y < 0 || y >= framebuffer.height)
     {
         return;
     }
 
-    win32.pixels[y * cfg.WINDOW_WIDTH + x] = color;
+    framebuffer.pixels[y * framebuffer.width + x] = color;
 }
 
 bool KeyDown(int key)
@@ -45,19 +43,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         return 0;
     }
 
-    //TODO get amount of textures from the gamedata. for debug there's just 1 texture
     for (int i = 0; i < cfg.textureAmount; i++) {
         Texture txt = LoadQRayAsset("assets\\" + std::to_string(i) + ".qrayasset");
         gTextures.push_back(txt);
     }
 
+    for (int i = (cfg.textureAmount - cfg.entityAmount); i < cfg.textureAmount; i++) {
+        EntityType entity = LoadQRayEntity("assets\\" + std::to_string(i) + ".qrayentity");
+        gEntityTypes.push_back(entity);
+    }
+
     LoadWorld("map.txt");
+
+    Entity debugEntity;
+    debugEntity.x = 12.0f;
+    debugEntity.y = 10.0f;
+    debugEntity.textureIndex = 1;
+    worldEntities.push_back(debugEntity);
+
+    Entity debugEntity2;
+    debugEntity2.x = 11.0f;
+    debugEntity2.y = 11.0f;
+    debugEntity2.textureIndex = 0;
+    worldEntities.push_back(debugEntity2);
 
     Win32State win32 = {};
 
     gWin32 = &win32;
 
     win32.hInst = hInstance;
+
+    win32.framebuffer.width = 640;
+
+    win32.framebuffer.height = 400;
+
+    win32.framebuffer.pixels = new uint32_t[640 * 400];
 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -72,8 +92,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     MyRegisterClass(win32, hInstance);
 
-    win32.pixels = new uint32_t[cfg.WINDOW_WIDTH * cfg.WINDOW_HEIGHT];
-
     if (!InitInstance(win32, hInstance, nCmdShow))
     {
         return FALSE;
@@ -86,8 +104,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     ZeroMemory(&win32.bitmapInfo, sizeof(win32.bitmapInfo));
 
     win32.bitmapInfo.bmiHeader.biSize = sizeof(win32.bitmapInfo.bmiHeader);
-    win32.bitmapInfo.bmiHeader.biWidth = cfg.WINDOW_WIDTH;
-    win32.bitmapInfo.bmiHeader.biHeight = -cfg.WINDOW_HEIGHT;
+    win32.bitmapInfo.bmiHeader.biWidth = 640;
+    win32.bitmapInfo.bmiHeader.biHeight = -400;
     win32.bitmapInfo.bmiHeader.biPlanes = 1;
     win32.bitmapInfo.bmiHeader.biBitCount = 32;
     win32.bitmapInfo.bmiHeader.biCompression = BI_RGB;
@@ -110,7 +128,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         {
             if (msg.message == WM_QUIT)
             {
-                delete[] win32.pixels;
+                delete[] win32.framebuffer.pixels;
                 DestroyWindow(win32.hWnd);
                 return (int)msg.wParam;
             }
@@ -119,8 +137,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             DispatchMessage(&msg);
         }
 
+        static float fpsTimer = 0.0f;
+
+        fpsTimer += deltaTime;
+
+        if (fpsTimer >= 0.25f)
+        {
+            fpsTimer = 0.0f;
+
+            float fps = 1.0f / deltaTime;
+
+            std::string title = narrowTitle + " - FPS: " + std::to_string((int)fps);
+
+            SetWindowTextA(win32.hWnd, title.c_str());
+        }
+
         // Render frame
-        Render(win32);
+        Render(win32.framebuffer);
 
         // Force repaint
         InvalidateRect(win32.hWnd, nullptr, FALSE);
@@ -191,13 +224,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
+
         StretchDIBits(
             hdc,
             0, 0,
             cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT,
             0, 0,
-            cfg.WINDOW_WIDTH, cfg.WINDOW_HEIGHT,
-            gWin32->pixels,
+            gWin32->framebuffer.width, gWin32->framebuffer.height,
+            gWin32->framebuffer.pixels,
             &gWin32->bitmapInfo,
             DIB_RGB_COLORS,
             SRCCOPY

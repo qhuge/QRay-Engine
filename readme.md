@@ -4,39 +4,35 @@ A WIP raycasting game engine.
 
 ## Usage
 
-Build both the QRayEditor.exe and the QRayRuntime.exe and make sure they are in the same folder.
+1. Build both the QRayEditor.exe and the QRayRuntime.exe and make sure they are in the same folder.
 
-Execute the QRayEditor.exe to open the editor.
+2. Open QRayEditor.exe
 
-Add your own block type (texture) at the right side of the editor, by clicking the + icon.
+3. Choose whether to Open previous projects (.qray files) or make a new one.
 
-A pop-up appears. Give a name for your block and click Browse to select a texture for your block. There are some example textures included in this repository. (Note that textures must be 32x32 pngs)
+4. Add a tile type (a new texture) by clicking "+ Add Tile Type" on the inspector panel.
 
-Once you've created a block type, select it from the block type selection. (Right side of the screen). 
+5. You can also add an entity type by clicking "+ Add Entity Type" on the inspector. Note that currently only static entities are supported. Also the tag system has not been implemented yet, so leave that at 0.
 
-Now you may click around the viewport (the grid) to place walls. Right click to remove a wall.
+6. Select a tile or entity from the list and left-click on the grid to place it there. Use right-click to remove tiles and entities.
 
-Add a spawnpoint to your map, by selecting "Spawnpoint" on the block type selection and clicking on the grid.
+7. You can build the game by going File -> Build, and choosing a location to build.
 
-Set a name for your game by going File -> Settings.
+## Latest features
 
-Build your game by clicking File -> Build, and choosing a location for you game.
-
-## Features
-
-You can change the resolution and title of your game from settings menu (File -> Settings)
+You can now save and load editor projects!
 
 ## TODO
 
 Here's a list of features that I consider are needed before I can release the first "official" version
 
 - Doors
-- Entities
-- Saving or loading editor projects
+- Moving entities
 - Start direction editable
 - Some kind of ui support
 - Weapons
 - Better visualizing of the map in the editor
+- Changing the game title (as there isnt a settings menu yet, the game title and resolution are locked)
 
 Things below are not necessarily needed but would be nice to have
 
