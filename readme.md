@@ -25,6 +25,7 @@ A WIP raycasting game engine.
 You can now save and load editor projects!
 
 This repo also features an example project, and the game built from that. Also there's some textures for experimenting!
+Keep in mind the game is built using Debug binaries, so the file size is bigger than usual.
 
 ## TODO
 
@@ -32,7 +33,6 @@ Here's a list of features that I consider are needed before I can release the fi
 
 - Doors
 - Moving entities
-- Start direction editable
 - Some kind of ui support
 - Weapons
 - Better visualizing of the map in the editor
