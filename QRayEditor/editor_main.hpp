@@ -9,6 +9,8 @@ extern int gSelectedEntityType;
 
 extern EditorCreateMode gCreateMode;
 
+extern int gDoorDirection;
+
 bool InitEditor(HINSTANCE hInstance, int nCmdShow);
 
 int RunEditorLoop();

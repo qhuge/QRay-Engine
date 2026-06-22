@@ -31,7 +31,6 @@ Keep in mind the game is built using Debug binaries, so the file size is bigger 
 
 Here's a list of features that I consider are needed before I can release the first "official" version
 
-- Doors
 - Moving entities
 - Some kind of ui support
 - Weapons

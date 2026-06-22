@@ -12,6 +12,7 @@ bool TileMatches(const Tile& tile, int x, int y)
     return tile.x == x && tile.y == y;
 }
 
+//TODO: start using grid based lookup instead of looping through the list of walls. this would bring the complexity from O(n) to O(1)
 int FindWall(int x, int y)
 {
     for (int i = 0; i < worldWalls.size(); i++)

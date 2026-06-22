@@ -59,8 +59,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         return 0;
     }
 
-    cfg.playerY -= 10;
-
     Win32State win32 = {};
 
     gWin32 = &win32;
@@ -142,6 +140,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             float fps = 1.0f / deltaTime;
 
             std::string title = narrowTitle + " - FPS: " + std::to_string((int)fps);
+            //std::string title = narrowTitle + " - coords: " + std::to_string((int)cfg.playerX) + ", " + std::to_string((int)cfg.playerY);
 
             SetWindowTextA(win32.hWnd, title.c_str());
         }

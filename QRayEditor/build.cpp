@@ -34,14 +34,25 @@ void WriteMap(std::string buildFolder, std::vector<Tile> tiles, std::vector<Enti
 		Tile& currentTile = tiles[i];
 
 		//-1 means its the spawnpoint. dont write that to the actual map.
-		if (currentTile.tileTypeIndex != -1) {
-			std::string newString = "T " + std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " " + std::to_string(currentTile.tileTypeIndex);
+		if (currentTile.tileTypeIndex >= 0) {
+			
+			std::string newString;
+
+			if (currentTile.doorDirection != DoorDirection::None) {
+				newString = "D " + std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " " + std::to_string(currentTile.tileTypeIndex) + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "0" : "1") + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "1" : "2") + "\nD " + std::to_string(currentTile.x + (currentTile.doorDirection == DoorDirection::Horizontal ? 1 : 0)) + " " + std::to_string(currentTile.y + (currentTile.doorDirection == DoorDirection::Horizontal ? 0 : 1)) + " " + std::to_string(currentTile.tileTypeIndex) + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "0" : "1") + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "3" : "0");
+			}
+			else {
+				newString = "T " + std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " " + std::to_string(currentTile.tileTypeIndex);
+			}
 
 			outfile << newString << std::endl;
-		}
-		else {
-			cfg.playerX = currentTile.x + 0.5f;
-			cfg.playerY = currentTile.y + 0.5f;
+		} else {
+			//-1 is the spawnpoint tile
+			//-2 is the other part of door.
+			if (currentTile.tileTypeIndex == -1) {
+				cfg.playerX = currentTile.x + 0.5f;
+				cfg.playerY = currentTile.y + 0.5f;
+			}
 		}
 	}
 

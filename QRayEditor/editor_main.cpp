@@ -32,7 +32,7 @@ static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
 int gSelectedTileType = -1;
 int gSelectedEntityType = -1;
 EditorCreateMode gCreateMode;
-
+int gDoorDirection = 0; //1 == PLACE THE DOOR TILES VERTICALLY, 0 = DOOR TILES HORIZONTALLY
 
 // Forward declare Win32 WndProc
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

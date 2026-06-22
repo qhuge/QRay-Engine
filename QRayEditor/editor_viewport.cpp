@@ -6,6 +6,8 @@
 #include "world.hpp"
 #include "config.hpp"
 #include "editor_main.hpp"
+#include "editor_popups_error.hpp"
+#include <algorithm>
 
 // simple grid settings
 static float gridSize = 32.0f;
@@ -88,12 +90,65 @@ void DrawViewport()
             topLeft.y + TILE_SIZE
         );
 
-        ImU32 color = IM_COL32(255, 255, 0, 255);
+        // Empty / special tile
+        if (tile.tileTypeIndex == -1)
+        {
+            draw->AddRectFilled(
+                topLeft,
+                bottomRight,
+                IM_COL32(255, 255, 0, 255) // Yellow
+            );
 
-        if (tile.tileTypeIndex != -1) {
-            TileType& tileType = save.tileTypes[tile.tileTypeIndex];
-            color = IM_COL32(tileType.r, tileType.g, tileType.b, 255);;
+            draw->AddRect(
+                topLeft,
+                bottomRight,
+                IM_COL32(0, 0, 0, 255)
+            );
+
+            continue;
         }
+
+        //ignore the rest of negative tiletypes
+        if (tile.tileTypeIndex < 0) {
+            continue;
+        }
+
+        TileType& tileType = save.tileTypes[tile.tileTypeIndex];
+
+        // Door rendering
+        if (tileType.isDoor)
+        {
+            const float thickness = 4.0f;
+            ImU32 doorColor = IM_COL32(tileType.r, tileType.g, tileType.b, 255);
+
+            if (tile.doorDirection == DoorDirection::Horizontal) {
+                draw->AddLine(
+                    ImVec2(bottomRight.x, topLeft.y),
+                    ImVec2(bottomRight.x, bottomRight.y),
+                    doorColor,
+                    thickness
+                );
+            }
+            else if (tile.doorDirection == DoorDirection::Vertical) {
+                draw->AddLine(
+                    ImVec2(bottomRight.x - TILE_SIZE, topLeft.y + TILE_SIZE),
+                    ImVec2(bottomRight.x, bottomRight.y),
+                    doorColor,
+                    thickness
+                );
+            }
+
+
+            continue;
+        }
+
+        // Normal wall rendering
+        ImU32 color = IM_COL32(
+            tileType.r,
+            tileType.g,
+            tileType.b,
+            255
+        );
 
         draw->AddRectFilled(topLeft, bottomRight, color);
         draw->AddRect(topLeft, bottomRight, IM_COL32(0, 0, 0, 255));
@@ -141,6 +196,16 @@ void DrawViewport()
 
     if (inside)
     {
+        if (ImGui::IsWindowHovered() && ImGui::IsKeyPressed(ImGuiKey_R))
+        {
+            if (gDoorDirection == 0) {
+                gDoorDirection = 1;
+            }
+            else if (gDoorDirection == 1) {
+                gDoorDirection = 0;
+            }
+        }
+
         ImVec2 topLeft(
             pos.x + cameraOffset.x + tileX * TILE_SIZE,
             pos.y + cameraOffset.y + tileY * TILE_SIZE
@@ -154,30 +219,107 @@ void DrawViewport()
             0,
             2.0f
         );
-        
+
+        //check if door is selected and in that case draw another hover rect
+        if (gSelectedTileType != -1) {
+            if (gCreateMode == EditorCreateMode::Tile && save.tileTypes[gSelectedTileType].isDoor) {
+                if (gDoorDirection == 0) {
+                    draw->AddRect(
+                        topLeft,
+                        ImVec2(topLeft.x + TILE_SIZE * 2, topLeft.y + TILE_SIZE),
+                        IM_COL32(255, 255, 0, 255),
+                        0.0f,
+                        0,
+                        2.0f
+                    );
+                }
+                else if (gDoorDirection == 1) {
+                    draw->AddRect(
+                        topLeft,
+                        ImVec2(topLeft.x + TILE_SIZE, topLeft.y + TILE_SIZE * 2),
+                        IM_COL32(255, 255, 0, 255),
+                        0.0f,
+                        0,
+                        2.0f
+                    );
+                }
+                
+            }
+        }
+
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
             if (FindWall(tileX, tileY) == -1 && FindEntity(tileX, tileY) == -1)
             {
                 if (gCreateMode == EditorCreateMode::Tile) {
+                    bool& isDoor = save.tileTypes[gSelectedTileType].isDoor;
+                    bool validTile = true;
+
                     Tile t;
-                    t.x = tileX;
-                    t.y = tileY;
-                    t.tileTypeIndex = gSelectedTileType;
 
-                    save.tiles.push_back(t);
+                    //ensure there's enough space for the door :D
+                    if (isDoor) {
+                        if (gDoorDirection == 0) {
 
-                    save.tileTypes[t.tileTypeIndex].timesUsed++;
+                            if (FindWall(tileX + 1, tileY) != -1 || FindEntity(tileX + 1, tileY) != -1) {
+                                validTile = false;
+                            }
 
-                } else if (gCreateMode == EditorCreateMode::Spawnpoint && !save.hasPlacedSpawnpoint) {
-                    Tile t;
-                    t.x = tileX;
-                    t.y = tileY;
-                    t.tileTypeIndex = -1;
+                            t.doorDirection = DoorDirection::Horizontal;
 
-                    save.tiles.push_back(t);
+                            //create a fake tile for the other part of the door, this is needed for the findwall checks to work
+                            Tile t2;
+                            t2.x = tileX + 1;
+                            t2.y = tileY;
+                            t2.tileTypeIndex = -2;// negative types are not rendered and other than -1 are also not built
+                            save.tiles.push_back(t2);
 
-                    save.hasPlacedSpawnpoint = true;
+                        }
+                        else {
+
+                            if (FindWall(tileX, tileY + 1) != -1 || FindEntity(tileX, tileY + 1) != -1) {
+                                validTile = false;
+                            }
+
+                            t.doorDirection = DoorDirection::Vertical;
+
+                            //create a fake tile for the other part of the door, this is needed for the findwall checks to work
+                            Tile t2;
+                            t2.x = tileX;
+                            t2.y = tileY + 1;
+                            t2.tileTypeIndex = -2;// negative types are not rendered and other than -1 are also not built
+                            save.tiles.push_back(t2);
+                        }
+                    }
+
+                    if (validTile) {
+                        
+                        t.x = tileX;
+                        t.y = tileY;
+                        t.tileTypeIndex = gSelectedTileType;
+
+                        save.tiles.push_back(t);
+
+                        save.tileTypes[t.tileTypeIndex].timesUsed++;
+                    }
+                    
+
+                } else if (gCreateMode == EditorCreateMode::Spawnpoint) {
+                    if (!save.hasPlacedSpawnpoint) {
+                        Tile t;
+                        t.x = tileX;
+                        t.y = tileY;
+                        t.tileTypeIndex = -1;
+
+                        save.tiles.push_back(t);
+
+                        //TODO: FOR SOME REASON THE SPAWNPOINT HAS 10 ADDED TO ITS Y?? LIKE IDK WHY
+                        save.hasPlacedSpawnpoint = true;
+                    }
+                    else {
+                        ShowError("Cant place tile", "You can only place 1 spawnpoint tile");
+                    }
+                    
                 } else if (gCreateMode == EditorCreateMode::Entity) {
                     Entity e;
                     e.x = tileX;
@@ -191,15 +333,37 @@ void DrawViewport()
             }
         } else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
             int tileIndex = FindWall(tileX, tileY);
-            if (tileIndex != -1) {
+            //ignore -2 as that cant directly be deleted. TODO: make a list of undeletable tiletypes and check against that
+            if (tileIndex != -1 && save.tiles[tileIndex].tileTypeIndex != -2) {
+
+                std::vector<int> indicesToDelete;
+
                 if (save.tiles[tileIndex].tileTypeIndex == -1) {
                     save.hasPlacedSpawnpoint = false;
                 }
                 else {
                     save.tileTypes[save.tiles[tileIndex].tileTypeIndex].timesUsed--;
+                
+                    if (save.tileTypes[save.tiles[tileIndex].tileTypeIndex].isDoor) {
+                        if (save.tiles[tileIndex].doorDirection == DoorDirection::Horizontal) {
+                            int secondDoorTileIndex = FindWall(tileX + 1, tileY);
+                            indicesToDelete.push_back(secondDoorTileIndex);
+                        }
+                        else {
+                            int secondDoorTileIndex = FindWall(tileX, tileY + 1);
+                            indicesToDelete.push_back(secondDoorTileIndex);
+                        }
+                    }
                 }
+                
+                indicesToDelete.push_back(tileIndex);
 
-                save.tiles.erase(save.tiles.begin() + tileIndex);
+                std::sort(indicesToDelete.rbegin(), indicesToDelete.rend());
+
+                for (int idx : indicesToDelete)
+                {
+                    save.tiles.erase(save.tiles.begin() + idx);
+                }       
             }
             else {
                 int entityIndex = FindEntity(tileX, tileY);

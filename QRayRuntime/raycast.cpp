@@ -225,60 +225,101 @@ RayHit CastRay(float posX, float posY, float angleDeg)
 
         
 
-        
-
         //Ambient occlusion
+        //TODO: fix door ambientocclusion.
 
         float ambient = 1.0f;
 
         if (side == 0) {
             if (rayDirX >= 0) {
-                if (FindWall(mapX - 1, mapY + 1) != -1 && textureX > 0.5f) {
-                    float ambMult = CalcAmbientMult(1.0f - textureX);
-                    ambient = ambMult;
+                if (textureX > 0.5f)
+                {
+                    int tileInd = FindWall(mapX - 1, mapY + 1);
+
+                    if (tileInd != -1 && !worldWalls[tileInd].isDoor)
+                    {
+                        ambient = CalcAmbientMult(1.0f - textureX);
+                    }
                 }
 
-                if (FindWall(mapX - 1, mapY - 1) != -1 && textureX < 0.5f) {
-                    float ambMult = CalcAmbientMult(textureX);
-                    ambient = ambMult;
+                if (textureX < 0.5f)
+                {
+                    int tileInd = FindWall(mapX - 1, mapY - 1);
+
+                    if (tileInd != -1 && !worldWalls[tileInd].isDoor)
+                    {
+                        ambient = CalcAmbientMult(textureX);
+                    }
                 }
             }
             else {
-                if (FindWall(mapX + 1, mapY + 1) != -1 && textureX > 0.5f) {
-                    float ambMult = CalcAmbientMult(1.0f - textureX);
-                    ambient = ambMult;
+                if (textureX > 0.5f)
+                {
+                    int tileInd = FindWall(mapX + 1, mapY + 1);
+
+                    if (tileInd != -1 && !worldWalls[tileInd].isDoor)
+                    {
+                        ambient = CalcAmbientMult(1.0f - textureX);
+                    }
                 }
 
-                if (FindWall(mapX + 1, mapY - 1) != -1 && textureX < 0.5f) {
-                    float ambMult = CalcAmbientMult(textureX);
-                    ambient = ambMult;
+                if (textureX < 0.5f)
+                {
+                    int tileInd = FindWall(mapX + 1, mapY - 1);
+
+                    if (tileInd != -1 && !worldWalls[tileInd].isDoor)
+                    {
+                        ambient = CalcAmbientMult(textureX);
+                    }
                 }
             }
         }
         else {
             if (rayDirY >= 0) {
-                if (FindWall(mapX + 1, mapY - 1) != -1 && textureX > 0.5f) {
-                    float ambMult = CalcAmbientMult(1.0f - textureX);
-                    ambient = ambMult;
+                if (textureX > 0.5f)
+                {
+                    int tileInd = FindWall(mapX + 1, mapY - 1);
+
+                    if (tileInd != -1 && !worldWalls[tileInd].isDoor)
+                    {
+                        ambient = CalcAmbientMult(1.0f - textureX);
+                    }
                 }
 
-                if (FindWall(mapX - 1, mapY - 1) != -1 && textureX < 0.5f) {
-                    float ambMult = CalcAmbientMult(textureX);
-                    ambient = ambMult;
+                if (textureX < 0.5f)
+                {
+                    int tileInd = FindWall(mapX - 1, mapY - 1);
+
+                    if (tileInd != -1 && !worldWalls[tileInd].isDoor)
+                    {
+                        ambient = CalcAmbientMult(textureX);
+                    }
                 }
             }
             else {
-                if (FindWall(mapX + 1, mapY + 1) != -1 && textureX > 0.5f) {
-                    float ambMult = CalcAmbientMult(1.0f - textureX);
-                    ambient = ambMult;
+                if (textureX > 0.5f)
+                {
+                    int tileInd = FindWall(mapX + 1, mapY + 1);
+
+                    if (tileInd != -1 && !worldWalls[tileInd].isDoor)
+                    {
+                        ambient = CalcAmbientMult(1.0f - textureX);
+                    }
                 }
 
-                if (FindWall(mapX - 1, mapY + 1) != -1 && textureX < 0.5f) {
-                    float ambMult = CalcAmbientMult(textureX);
-                    ambient = ambMult;
+                if (textureX < 0.5f)
+                {
+                    int tileInd = FindWall(mapX - 1, mapY + 1);
+
+                    if (tileInd != -1 && !worldWalls[tileInd].isDoor)
+                    {
+                        ambient = CalcAmbientMult(textureX);
+                    }
                 }
             }
         }
+
+        
 
         //Fetch texture index
         int wallTextureIndex = worldWalls[WallIndex].textureIndex;

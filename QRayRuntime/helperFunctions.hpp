@@ -12,6 +12,8 @@ int clampInt(int a, int max);
 
 bool compareDistance(const EntityToRender& a, const EntityToRender& b);
 
+bool IsNearTile(const Tile& tile, float margin);
+
 bool PlayerBetweenDoor(const Tile& doorTile1, const Tile& doorTile2);
 
 bool IsWallAt(float x, float y);

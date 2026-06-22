@@ -49,17 +49,17 @@ bool compareDistance(const EntityToRender& a, const EntityToRender& b)
     return a.d > b.d;
 }
 
+bool IsNearTile(const Tile& tile, float margin)
+{
+    return cfg.playerX > tile.x - margin &&
+        cfg.playerX < tile.x + 1.0f + margin &&
+        cfg.playerY > tile.y - margin &&
+        cfg.playerY < tile.y + 1.0f + margin;
+}
+
 bool PlayerBetweenDoor(const Tile& doorTile1, const Tile& doorTile2)
 {
-    if (cfg.playerX > doorTile1.x && cfg.playerX < (doorTile1.x + 1) && cfg.playerY > doorTile1.y && cfg.playerY < (doorTile1.y + 1)) {
-        return true;
-    }
-    else if (cfg.playerX > doorTile2.x && cfg.playerX < (doorTile2.x + 1) && cfg.playerY > doorTile2.y && cfg.playerY < (doorTile2.y + 1)) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return IsNearTile(doorTile1, 1.5f) || IsNearTile(doorTile2, 1.5f);
 }
 
 bool IsWallAt(float x, float y)
@@ -74,7 +74,7 @@ bool IsWallAt(float x, float y)
         if (!t.isDoor) {
             return true;
         }
-        if (t.door.open >= 0.8f) {
+        if (t.door.open >= 0.9f) {
             return false;
         }
     }

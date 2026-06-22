@@ -15,11 +15,21 @@ enum LOSMovementType
     LOS_CHARGE_PLAYER = 2
 };
 
+//the 2 door TILES are placed in horizontal order.
+enum DoorDirection
+{
+    None = 0,
+    Horizontal = 1,
+    Vertical = 2,
+};
+
 struct Tile
 {
 	int x;
 	int y;
     int tileTypeIndex;
+
+    DoorDirection doorDirection = DoorDirection::None; //the 2 door TILES are placed in horizontal order.
 };
 struct TileType
 {
@@ -30,6 +40,8 @@ struct TileType
 	int r, g, b;
 
 	int timesUsed = 0;
+
+    bool isDoor = false;
 };
 
 struct Entity

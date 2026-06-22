@@ -15,8 +15,7 @@ int FindWall(int x, int y)
 {
     for (int i = 0; i < save.tiles.size(); i++)
     {
-        if (save.tiles[i].x == x &&
-            save.tiles[i].y == y)
+        if (save.tiles[i].x == x && save.tiles[i].y == y)
         {
             return i;
         }
