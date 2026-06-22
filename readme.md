@@ -29,7 +29,7 @@ Keep in mind the game is built using Debug binaries, so the file size is bigger 
 
 ## TODO
 
-Here's a list of features that I consider are needed before I can release the first "official" version
+Here's a list of features that I consider are "high priority"
 
 - Moving entities
 - Some kind of ui support
@@ -41,3 +41,5 @@ Things below are not necessarily needed but would be nice to have
 
 - Multiple map support? (Load new map after getting to a specific point in the previous one)
 - HTML build target (using HTML5 Canvas or WebGL)
+- "View bobbing" when running
+- Customize floor and ceiling colors
