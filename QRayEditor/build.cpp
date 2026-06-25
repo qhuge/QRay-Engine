@@ -192,6 +192,11 @@ void build(std::string path) {
 	cfg.renderDistance = save.renderDistance;
 	cfg.angleOffset = save.startingAngle;
 
+	//ceil and floor colors
+	cfg.ceilingColor = (uint32_t(save.ceilingColor[0] * 255.0f) << 16) | (uint32_t(save.ceilingColor[1] * 255.0f) << 8) | (uint32_t(save.ceilingColor[2] * 255.0f));
+	cfg.floorColor = (uint32_t(save.floorColor[0] * 255.0f) << 16) | (uint32_t(save.floorColor[1] * 255.0f) << 8) | (uint32_t(save.floorColor[2] * 255.0f));
+
+
 	//write map file
 	WriteMap(buildFolder, newMap, newEnt, cfg);
 

@@ -55,6 +55,8 @@ void SaveProject(const std::string& path)
     out.write((char*)&save.resolutionY, sizeof(save.resolutionY));
     out.write((char*)&save.startingAngle, sizeof(save.startingAngle));
     out.write((char*)&save.renderDistance, sizeof(save.renderDistance));
+    out.write((char*)&save.ceilingColor, sizeof(save.ceilingColor));
+    out.write((char*)&save.floorColor, sizeof(save.floorColor));
     out.write((char*)&save.hasPlacedSpawnpoint, sizeof(save.hasPlacedSpawnpoint));
 
     writeVec(save.tiles);
@@ -86,6 +88,8 @@ void LoadProject(const std::string& path, HWND g_hWnd)
     in.read((char*)&p.resolutionY, sizeof(int));
     in.read((char*)&p.startingAngle, sizeof(int));
     in.read((char*)&p.renderDistance, sizeof(int));
+    in.read((char*)&p.ceilingColor, sizeof(p.ceilingColor));
+    in.read((char*)&p.floorColor, sizeof(p.floorColor));
     in.read((char*)&p.hasPlacedSpawnpoint, sizeof(bool));
 
     readVec(p.tiles);

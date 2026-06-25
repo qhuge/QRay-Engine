@@ -31,6 +31,10 @@ struct GameConfig {
 	uint16_t textureAmount;
 
 	int entityAmount;
+
+	uint32_t ceilingColor;
+
+	uint32_t floorColor;
 };
 
 struct ProjectFile
@@ -42,6 +46,9 @@ struct ProjectFile
 	int resolutionY = 400;
 	int startingAngle = -90;
 	int renderDistance = 30;
+
+	float ceilingColor[3] = { 0.47f, 0.47f, 0.47f };
+	float floorColor[3] = { 0.24f, 0.24f, 0.24f };
 
 	bool hasPlacedSpawnpoint = false;
 

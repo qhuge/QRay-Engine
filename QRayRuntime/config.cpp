@@ -36,3 +36,5 @@ bool InitConfig() {
 std::vector<Texture> gTextures;
 
 std::vector<EntityType> gEntityTypes;
+
+std::vector<int> gPlayerTags;

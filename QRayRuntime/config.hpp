@@ -32,6 +32,10 @@ struct GameConfig {
 	uint16_t textureAmount;
 
 	int entityAmount;
+
+	uint32_t ceilingColor;
+
+	uint32_t floorColor;
 };
 
 extern GameConfig cfg;
@@ -54,3 +58,5 @@ struct QRayTextureAssetHeader
 extern std::vector<Texture> gTextures;
 
 extern std::vector<EntityType> gEntityTypes;
+
+extern std::vector<int> gPlayerTags;

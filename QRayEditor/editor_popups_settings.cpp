@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include <string>
 #include <cstring>
+#include <cmath>
 
 // internal popup state
 static bool gShowSettingsPopup = false;
@@ -15,6 +16,8 @@ static int gWindowWidth;
 static int gWindowHeight;
 static int gRenderDistance;
 static float gStartingAngle;
+static float gCeilingColor[3];
+static float gFloorColor[3];
 
 // --------------------------------------------------
 // Public API
@@ -29,6 +32,14 @@ void OpenSettingsPopup()
     gWindowHeight = save.resolutionY;
     gRenderDistance = save.renderDistance;
     gStartingAngle = save.startingAngle + 90.0f;
+
+    gCeilingColor[0] = save.ceilingColor[0];
+    gCeilingColor[1] = save.ceilingColor[1];
+    gCeilingColor[2] = save.ceilingColor[2];
+
+    gFloorColor[0] = save.floorColor[0];
+    gFloorColor[1] = save.floorColor[1];
+    gFloorColor[2] = save.floorColor[2];
 
     gShowSettingsPopup = true;
 }
@@ -65,6 +76,12 @@ void DrawSettingsPopup()
         ImGui::Text("Starting Angle");
         ImGui::SliderFloat("##angle", &gStartingAngle, 0.0f, 360.0f);
 
+        ImGui::Text("Ceiling Color");
+        ImGui::ColorEdit3("##ceilingColor", gCeilingColor);
+
+        ImGui::Text("Floor Color");
+        ImGui::ColorEdit3("##floorColor", gFloorColor);
+
         ImGui::Separator();
 
         float buttonWidth = 120.0f;
@@ -83,6 +100,14 @@ void DrawSettingsPopup()
             save.resolutionY = gWindowHeight;
             save.renderDistance = gRenderDistance;
             save.startingAngle = gStartingAngle - 90.0f;
+
+            save.ceilingColor[0] = gCeilingColor[0];
+            save.ceilingColor[1] = gCeilingColor[1];
+            save.ceilingColor[2] = gCeilingColor[2];
+
+            save.floorColor[0] = gFloorColor[0];
+            save.floorColor[1] = gFloorColor[1];
+            save.floorColor[2] = gFloorColor[2];
 
             strcpy_s(save.projectTitle, gProjectName);
 

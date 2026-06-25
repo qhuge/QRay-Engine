@@ -19,7 +19,8 @@ std::vector<float> gDepthBuffer;
 
 void Render(Framebuffer framebuffer)
 {
-    ClearScreen(framebuffer, 0x00000000);
+    
+    //ClearScreen(framebuffer, 0x00000000);
 
     // =========================================
     // INPUT
@@ -117,17 +118,21 @@ void Render(Framebuffer framebuffer)
 
     for (int y = 0; y < framebuffer.height / 2; y++)
     {
+        uint32_t* row = framebuffer.pixels + y * framebuffer.width;
+
         for (int x = 0; x < framebuffer.width; x++)
         {
-            PutPixel(framebuffer, x, y, 0x00787878);
+            row[x] = cfg.ceilingColor;
         }
     }
 
     for (int y = framebuffer.height / 2; y < framebuffer.height; y++)
     {
+        uint32_t* row = framebuffer.pixels + y * framebuffer.width;
+
         for (int x = 0; x < framebuffer.width; x++)
         {
-            PutPixel(framebuffer, x, y, 0x003C3C3C);
+            row[x] = cfg.floorColor;
         }
     }
 

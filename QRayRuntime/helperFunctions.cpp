@@ -85,9 +85,14 @@ bool CanMoveTo(float x, float y)
 {
     const float r = 0.2f;
 
-    return
-        !IsWallAt(x - r, y - r) &&
-        !IsWallAt(x + r, y - r) &&
-        !IsWallAt(x - r, y + r) &&
-        !IsWallAt(x + r, y + r);
+    return !IsWallAt(x - r, y - r) && !IsWallAt(x + r, y - r) && !IsWallAt(x - r, y + r) && !IsWallAt(x + r, y + r);
+}
+
+static bool hasTag(int tag) {
+    for (int i = 0; i < gPlayerTags.size(); i++) {
+        if (gPlayerTags[i] == tag) {
+            return true;
+        }
+    }
+    return false;
 }
