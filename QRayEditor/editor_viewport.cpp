@@ -250,8 +250,9 @@ void DrawViewport()
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
             if (FindWall(tileX, tileY) == -1 && FindEntity(tileX, tileY) == -1)
-            {
-                if (gCreateMode == EditorCreateMode::Tile) {
+            {    
+                //gSelectedTileType is initialized as -1. This needs to be checked or else the program crashes when clicking at start!!
+                if (gCreateMode == EditorCreateMode::Tile && gSelectedTileType != -1) {
                     bool& isDoor = save.tileTypes[gSelectedTileType].isDoor;
                     bool validTile = true;
 
@@ -313,14 +314,13 @@ void DrawViewport()
 
                         save.tiles.push_back(t);
 
-                        //TODO: FOR SOME REASON THE SPAWNPOINT HAS 10 ADDED TO ITS Y?? LIKE IDK WHY
                         save.hasPlacedSpawnpoint = true;
                     }
                     else {
                         ShowError("Cant place tile", "You can only place 1 spawnpoint tile");
                     }
                     
-                } else if (gCreateMode == EditorCreateMode::Entity) {
+                } else if (gCreateMode == EditorCreateMode::Entity && gSelectedEntityType != -1) {
                     Entity e;
                     e.x = tileX;
                     e.y = tileY;
