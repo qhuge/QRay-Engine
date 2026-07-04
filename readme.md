@@ -2,6 +2,8 @@
 
 A WIP raycasting game engine.
 
+![A gif showing a user using the software](img/banner.gif)
+
 ## Usage
 
 1. Build both the QRayEditor.exe and the QRayRuntime.exe and make sure they are in the same folder.
@@ -42,4 +44,3 @@ Things below are not necessarily needed but would be nice to have
 - Multiple map support? (Load new map after getting to a specific point in the previous one)
 - HTML build target (using HTML5 Canvas or WebGL)
 - "View bobbing" when running
-- Customize floor and ceiling colors
