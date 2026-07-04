@@ -2,7 +2,7 @@
 
 A WIP raycasting game engine.
 
-![A gif showing a user using the software](img/banner.gif)
+![A gif showing a user using the software](https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExb3I0cGVla3JjZHVnNnluNWU1YzV1MDBsbWd3MDFramIyY290cHc2MiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dh6Yn13fykChslAC0f/giphy.gif)
 
 ## Usage
 
