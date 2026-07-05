@@ -46,7 +46,7 @@ struct Texture
 {
 	uint32_t width;
 	uint32_t height;
-	std::vector<unsigned char> pixels;
+	std::vector<uint32_t> pixels;
 };
 struct QRayTextureAssetHeader
 {

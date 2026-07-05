@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="config.cpp" />
     <ClCompile Include="helperFunctions.cpp" />
+    <ClCompile Include="input.cpp" />
     <ClCompile Include="raycast.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="window_win32.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="config.hpp" />
     <ClInclude Include="entity_rendering.hpp" />
     <ClInclude Include="helperFunctions.hpp" />
+    <ClInclude Include="input.hpp" />
     <ClInclude Include="raycast.hpp" />
     <ClInclude Include="renderer.hpp" />
     <ClInclude Include="resource.h" />

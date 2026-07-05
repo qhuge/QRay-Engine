@@ -12,105 +12,14 @@
 #include "world.hpp"
 #include "types.hpp"
 #include "entity_rendering.hpp"
-
-const float playerRadius = 0.2f;
+#include "input.hpp"
 
 std::vector<float> gDepthBuffer;
 
 void Render(Framebuffer framebuffer)
 {
-    
-    //ClearScreen(framebuffer, 0x00000000);
-
-    // =========================================
-    // INPUT
-    // =========================================
-
-    float movementAngle = -cfg.angleOffset;
-
-    float moveSpeedNow = cfg.moveSpeed;
-
-    if (KeyDown(VK_SHIFT))
-    {
-        moveSpeedNow = cfg.runSpeed;
-    }
-
-    float angleRad = cfg.angleOffset * M_PI / 180.0f;
-
-    float forwardX = cosf(angleRad);
-    float forwardY = sinf(angleRad);
-
-    float rightX = cosf(angleRad + M_PI * 0.5f);
-    float rightY = sinf(angleRad + M_PI * 0.5f);
-
-    float moveX = 0.0f;
-    float moveY = 0.0f;
-
-    // Forward
-    if (KeyDown('W'))
-    {
-        moveX += forwardX;
-        moveY += forwardY;
-    }
-
-    // Backward
-    if (KeyDown('S'))
-    {
-        moveX -= forwardX;
-        moveY -= forwardY;
-    }
-
-    // Left
-    if (KeyDown('A'))
-    {
-        moveX -= rightX;
-        moveY -= rightY;
-    }
-
-    // Right
-    if (KeyDown('D'))
-    {
-        moveX += rightX;
-        moveY += rightY;
-    }
-
-    float length = sqrtf(moveX * moveX + moveY * moveY);
-
-    if (length > 0.0f)
-    {
-        moveX /= length;
-        moveY /= length;
-    }
-
-    float newX = cfg.playerX + moveX * moveSpeedNow * deltaTime;
-    float newY = cfg.playerY + moveY * moveSpeedNow * deltaTime;
-
-    if (CanMoveTo(newX, cfg.playerY))
-    {
-        cfg.playerX = newX;
-    }
-
-    if (CanMoveTo(cfg.playerX, newY))
-    {
-        cfg.playerY = newY;
-    }
-
-    // =========================================
-    // ROTATION
-    // =========================================
-
-    if (KeyDown(VK_RIGHT))
-    {
-        cfg.angleOffset += cfg.angleSpeed * deltaTime;
-    }
-
-    if (KeyDown(VK_LEFT))
-    {
-        cfg.angleOffset -= cfg.angleSpeed * deltaTime;
-    }
-
-    if (cfg.angleOffset >= 270) { cfg.angleOffset = -90; }
-    else if (cfg.angleOffset <= -270) { cfg.angleOffset = 90; }
+    //First process input (and handle movement)
+    processInput();
 
     // =========================================
     // FLOOR + CEILING
@@ -138,6 +47,7 @@ void Render(Framebuffer framebuffer)
 
     //RENDER
     
+    //reset the depth buffer so its ready for a new frame
     gDepthBuffer.clear();
 
     float projectionPlaneDistance = (framebuffer.width / 2.0f) / tanf((cfg.FOV * 0.5f) * M_PI / 180.0f);
@@ -146,6 +56,7 @@ void Render(Framebuffer framebuffer)
 
         RayHit hit = CastRay(cfg.playerX, cfg.playerY, rayAngle);
 
+        //if the key E is pressed
         if (GetAsyncKeyState('E') & 0x8000)
         {
             if (hit.distance > 0.0f && hit.distance < 1.5f)
@@ -163,22 +74,23 @@ void Render(Framebuffer framebuffer)
             }
         }
 
-
+        //if we actually hit something
         if (hit.distance > 0.0f)
         {
+            //calucate the perpendicular distance. TODO: this (rayAngle - cfg.angleOffset) might be incorrect
             float correctedDistance = cosf((rayAngle - cfg.angleOffset) * M_PI / 180.0f) * hit.distance;
-
+             
             if (correctedDistance < 0.01f)
             {
                 correctedDistance = 0.01f;
             }
 
+            //add the distance to the depth buffer
             gDepthBuffer.push_back(correctedDistance);
 
             float wallHeight = projectionPlaneDistance / correctedDistance;
 
             int textureIndex = hit.textureIndex;
-            bool isValidTexture = true;
 
             Texture* tex = nullptr;
 
@@ -191,49 +103,64 @@ void Render(Framebuffer framebuffer)
 
             int endY = startY + (int)wallHeight;
 
+            //calculate the brightness
+            float brightness = CalcColorMult(correctedDistance) * hit.ambient;
+
+            //int multiplication is faster than float
+            int light = (int)(brightness * 255.0f);
+
+            int texX = (int)(hit.textureX * tex->width);
+
+            //calculate a 16.16 step avoid dividing
+            int step = (tex->height << 16) / wallHeight;
+            int clippedStart = std::max(startY, 0);
+            int texPos = (clippedStart - startY) * step;
+
             for (int p = startY; p < endY; p++)
             {
-                if (p < 0 || p > framebuffer.height) {
+                if (p <= 0 || p >= framebuffer.height) {
                     continue;
                 }
 
-                float brightness = CalcColorMult(correctedDistance) * hit.ambient;
-
-                float r;
-                float g;
-                float b;
+                uint32_t pixel;
 
                 if (!tex) {
-                    r = 1.0f;
-                    g = 0.0f;
-                    b = 1.0f;
+                    //if theres an invalid texture then display purple color
+                    pixel = 0x00FF00FF;
                 }
                 else {
-                    int texX = (int)(hit.textureX * tex->width);
+                    //calculate the texture y coordinate
+                    int texY = texPos >> 16;
 
-                    int texY = ((p - startY) * tex->height) / (int)wallHeight;
-
+                    //ensure that the texture coordinates are within bounds
                     texX = clampInt(texX, tex->width - 1);
                     texY = clampInt(texY, tex->height - 1);
 
-                    int index = (texY * tex->width + texX) * 4;
+                    //get the index of the color at texX, texY.
+                    int index = texY * tex->width + texX;
 
-                    r = tex->pixels[index + 0] / 255.0f;
-                    g = tex->pixels[index + 1] / 255.0f;
-                    b = tex->pixels[index + 2] / 255.0f;
+                    //get the pixel at that specific index
+                    pixel = tex->pixels[index];
                 }
                 
+                //increment the texPos
+                texPos += step;
 
-                r *= brightness;
-                g *= brightness;
-                b *= brightness;
+                //get raw pixel values
+                uint8_t r = pixel & 0xFF;
+                uint8_t g = (pixel >> 8) & 0xFF;
+                uint8_t b = (pixel >> 16) & 0xFF;
 
-                uint32_t color =
-                    ((uint8_t)(r * 255) << 16) |
-                    ((uint8_t)(g * 255) << 8) |
-                    ((uint8_t)(b * 255));
+                //>>8 is faster than dividing by 255
+                r = (r * light) >> 8;
+                g = (g * light) >> 8;
+                b = (b * light) >> 8;
 
-                PutPixel(framebuffer, x, p, color);
+                //combine the channels back
+                uint32_t color = (r << 16) | (g << 8) | b;
+
+                //writing directly to the framebuffer is probably faster
+                framebuffer.pixels[p * framebuffer.width + x] = color;
             }
         }
         else {
@@ -241,7 +168,7 @@ void Render(Framebuffer framebuffer)
         }
     }
 
-
+    //make a vector of the entities. we can save the distance and angle to it so they dont have to be calculated again later.
     std::vector<EntityToRender> entToRender;
     for (int i = 0; i < worldEntities.size(); i++) {
         Entity& e = worldEntities[i];
@@ -377,7 +304,12 @@ void Render(Framebuffer framebuffer)
             //rows
             for (int y = startY; y < endY; y++)
             {
-                uint32_t color = 0xFF00FF;
+
+                if (y < 0 || y >= framebuffer.height) {
+                    continue;
+                }
+
+                uint32_t framebufferColor = 0x00FF00FF;
 
                 if (tex)
                 {
@@ -389,15 +321,14 @@ void Render(Framebuffer framebuffer)
                     if (textureY >= tex->height)
                         textureY = tex->height - 1;
 
-                    int index = (textureY * tex->width + textureX) * 4;
+                    //get the index of the color at textureX, textureY.
+                    int index = textureY * tex->width + textureX;
 
-                    unsigned char r = tex->pixels[index + 0];
+                    //get the color
+                    uint32_t color = tex->pixels[index];
 
-                    unsigned char g = tex->pixels[index + 1];
-
-                    unsigned char b = tex->pixels[index + 2];
-
-                    unsigned char a = tex->pixels[index + 3];
+                    //get the alpha to see if its transparent
+                    uint8_t a = (color >> 24) & 0xFF;
 
                     // Transparent pixel
                     if (a == 0)
@@ -405,10 +336,17 @@ void Render(Framebuffer framebuffer)
                         continue;
                     }
 
-                    color = (r << 16) | (g << 8) | b;
+                    //get raw pixel values
+                    uint8_t r = color & 0xFF;
+                    uint8_t g = (color >> 8) & 0xFF;
+                    uint8_t b = (color >> 16) & 0xFF;
+
+                    //combine the channels back
+                    framebufferColor = (r << 16) | (g << 8) | b;
                 }
 
-                PutPixel(framebuffer, x, y, color);
+                //write to the framebuffer
+                framebuffer.pixels[y * framebuffer.width + x] = framebufferColor;
             }
         }
     }

@@ -181,10 +181,11 @@ Texture LoadQRayAsset(std::string path)
     tex.width = header.width;
     tex.height = header.height;
 
-    size_t size = header.width * header.height * 4;
-    tex.pixels.resize(size);
+    size_t pixelCount = header.width * header.height;
 
-    file.read((char*)tex.pixels.data(), size);
+    tex.pixels.resize(pixelCount);
+
+    file.read((char*)tex.pixels.data(), pixelCount * sizeof(uint32_t));
 
     return tex;
 }
