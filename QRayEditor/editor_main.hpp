@@ -6,7 +6,6 @@
 
 extern int gSelectedTileType;
 extern int gSelectedEntityType;
-
 extern EditorCreateMode gCreateMode;
 
 extern int gDoorDirection;

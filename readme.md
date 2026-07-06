@@ -26,7 +26,10 @@ A WIP raycasting game engine.
 
 ## Latest features
 
-The entity and door tagging system works sort of... And entity collisions work also!
+- The entity and door tagging system works sort of...
+- Entity collisions added
+- Now you have the ability to delete previously added tile- and enitytypes. 
+- Also added the ability to use larger texture sizes. (experimental)
 
 This repo also features an example project, and the game built from that. Also there's some textures for experimenting!
 Keep in mind the game is built using Debug binaries, so the file size is bigger than usual.

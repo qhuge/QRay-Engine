@@ -142,14 +142,10 @@ void DrawViewport()
             continue;
         }
 
-        // Normal wall rendering
-        ImU32 color = IM_COL32(
-            tileType.r,
-            tileType.g,
-            tileType.b,
-            255
-        );
+        //get the tiletype color
+        ImU32 color = IM_COL32(tileType.r, tileType.g, tileType.b, 255);
 
+        //render the rectangle
         draw->AddRectFilled(topLeft, bottomRight, color);
         draw->AddRect(topLeft, bottomRight, IM_COL32(0, 0, 0, 255));
     }
@@ -161,16 +157,10 @@ void DrawViewport()
             pos.y + cameraOffset.y + entity.y * TILE_SIZE + TILE_SIZE * 0.5f
         );
 
-        ImU32 color;
+        //get the color
+        ImU32 color = IM_COL32(save.entityTypes[entity.entityTypeIndex].r, save.entityTypes[entity.entityTypeIndex].g, save.entityTypes[entity.entityTypeIndex].b, 255);
 
-        switch (entity.entityTypeIndex)
-        {
-        case 0: color = IM_COL32(255, 220, 50, 255); break;
-        case 1: color = IM_COL32(50, 255, 120, 255); break;
-        case 2: color = IM_COL32(255, 80, 80, 255); break;
-        default: color = IM_COL32(220, 220, 220, 255); break;
-        }
-
+        //render the entity
         draw->AddCircleFilled(center, RADIUS, color, 12);
         draw->AddCircle(center, RADIUS, IM_COL32(0, 0, 0, 255), 12, 1.5f);
     }

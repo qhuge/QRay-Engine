@@ -23,6 +23,8 @@ std::string OpenFileDialogPNG();
 
 bool CopyAssetToProject(const std::string& sourcePath, const std::string& projectFolder, std::string& outRelativePath);
 
+bool DeleteAssetFile(const std::string& savePath, const std::string& assetPath);
+
 std::string GenerateAssetName(const std::string& original);
 
 void SetRandomColorForTile(TileType& t);

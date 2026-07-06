@@ -15,14 +15,15 @@
 #include "editor_helpers.hpp"
 #include <filesystem>
 #include "editor_popups_add_tile.hpp"
+#include "editor_popups_remove_tile.hpp"
 #include "build.hpp"
 #include "editor_popups_error.hpp"
 #include "editor_popups_add_entity.hpp"
 #include "editor_popups_settings.hpp"
+#include "editor_popups_remove_entity.hpp"
 
-// --------------------
-// Globals (minimal)
-// --------------------
+
+// Globals
 static HWND g_hWnd = nullptr;
 static ID3D11Device* g_pd3dDevice = nullptr;
 static ID3D11DeviceContext* g_pd3dDeviceContext = nullptr;
@@ -37,9 +38,8 @@ int gDoorDirection = 0; //1 == PLACE THE DOOR TILES VERTICALLY, 0 = DOOR TILES H
 // Forward declare Win32 WndProc
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-// --------------------
+
 // DX11 helpers
-// --------------------
 static void CreateRenderTarget()
 {
     ID3D11Texture2D* pBackBuffer = nullptr;
@@ -53,9 +53,7 @@ static void CleanupRenderTarget()
     if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = nullptr; }
 }
 
-// --------------------
 // WndProc
-// --------------------
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
@@ -80,9 +78,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-// --------------------
 // Init Editor Window
-// --------------------
 bool InitEditor(HINSTANCE hInstance, int nCmdShow)
 {
     WNDCLASS wc = {};
@@ -107,9 +103,7 @@ bool InitEditor(HINSTANCE hInstance, int nCmdShow)
 
     ShowWindow(g_hWnd, nCmdShow);
 
-    // --------------------
-    // DX11 Init (minimal)
-    // --------------------
+    // DX11 Init
     DXGI_SWAP_CHAIN_DESC sd = {};
     sd.BufferCount = 2;
     sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -136,9 +130,7 @@ bool InitEditor(HINSTANCE hInstance, int nCmdShow)
 
     CreateRenderTarget();
 
-    // --------------------
     // ImGui Init
-    // --------------------
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -152,9 +144,7 @@ bool InitEditor(HINSTANCE hInstance, int nCmdShow)
     return true;
 }
 
-// --------------------
 // Main loop
-// --------------------
 int RunEditorLoop()
 {
     MSG msg;
@@ -180,6 +170,8 @@ int RunEditorLoop()
         DrawErrorPopup();
         DrawAddEntityPopup();
         DrawSettingsPopup();
+        DrawRemoveTilePopup();
+        DrawRemoveEntityPopup();
 
 
 
@@ -238,6 +230,24 @@ int RunEditorLoop()
 
                 if (selected)
                     ImGui::PopStyleColor();
+
+                //BELOW: remove buttons
+                ImGui::SameLine();
+
+                //make the button alpha .5
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 0.4f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.2f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.2f, 0.2f, 1.0f));
+
+                if (ImGui::SmallButton(("X##" + std::to_string(i)).c_str()))
+                {
+                    OpenRemoveTilePopup(i);
+
+                    //reset selected item:
+                    gSelectedTileType = -1;
+                }
+
+                ImGui::PopStyleColor(3);
             }
 
             bool spawnSelected = (gCreateMode == EditorCreateMode::Spawnpoint);
@@ -278,6 +288,24 @@ int RunEditorLoop()
 
                 if (selected)
                     ImGui::PopStyleColor();
+
+                //BELOW: remove buttons
+                ImGui::SameLine();
+
+                //make the button alpha .5
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 0.4f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.2f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.2f, 0.2f, 1.0f));
+
+                if (ImGui::SmallButton(("X##" + std::to_string(i + save.tileTypes.size())).c_str()))
+                {
+                    OpenRemoveEntityPopup(i);
+
+                    //reset selected item:
+                    gSelectedEntityType = -1;
+                }
+
+                ImGui::PopStyleColor(3);
             }
 
 
@@ -373,9 +401,7 @@ int RunEditorLoop()
     }
 }
 
-// --------------------
 // Shutdown
-// --------------------
 void ShutdownEditor()
 {
     ImGui_ImplDX11_Shutdown();

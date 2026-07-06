@@ -236,7 +236,7 @@ bool CopyAssetToProject(const std::string& sourcePath, const std::string& projec
         fs::path assetsDir = fs::path(projectFolder) / "assets";
         fs::create_directories(assetsDir);
 
-        // avoid name conflicts (optional but recommended)
+        // avoid name conflicts
         std::string filename = GenerateAssetName(src.filename().string());
         fs::path dest = assetsDir / filename;
 
@@ -250,6 +250,14 @@ bool CopyAssetToProject(const std::string& sourcePath, const std::string& projec
     {
         return false;
     }
+}
+
+bool DeleteAssetFile(const std::string& savePath, const std::string& assetPath) {
+    std::filesystem::path fullPath = std::filesystem::path(savePath) / assetPath;
+
+    bool success = std::filesystem::remove(fullPath);
+
+    return success;
 }
 
 std::string GenerateAssetName(const std::string& original)
