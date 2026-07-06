@@ -21,6 +21,9 @@ void Render(Framebuffer framebuffer)
     //First process input (and handle movement)
     processInput();
 
+    //process the entity pickups
+    processEntities();
+
     // =========================================
     // FLOOR + CEILING
     // =========================================
@@ -63,8 +66,9 @@ void Render(Framebuffer framebuffer)
             {
                 Tile& tile = worldWalls[hit.tileIndex];
 
-                if (tile.isDoor)
+                if (tile.isDoor && (tile.door.tag == 0 || hasTag(tile.door.tag)))
                 {
+
                     tile.door.targetOpen = true;
                     tile.door.openTimer = 5.0f;
 
@@ -164,6 +168,7 @@ void Render(Framebuffer framebuffer)
             }
         }
         else {
+            //if we didnt hit anything, then add -1 to the depth buffer
             gDepthBuffer.push_back(-1.0f);
         }
     }
@@ -184,8 +189,8 @@ void Render(Framebuffer framebuffer)
 
         float distance = sqrtf(dx * dx + dy * dy);
 
-        // Skip extremely close entities
-        if (distance <= 0.01f)
+        // Skip extremely close entities and far away ones
+        if (distance <= 0.01f || distance >= cfg.renderDistance)
         {
             continue;
         }
@@ -230,6 +235,7 @@ void Render(Framebuffer framebuffer)
     //render entities
     for(int i = 0; i < entToRender.size(); i++)
     {
+        //get values precalculated from the array
         Entity* e = entToRender[i].e;
         float correctedDistance = entToRender[i].d;
         float relativeAngle = entToRender[i].a;
@@ -282,7 +288,7 @@ void Render(Framebuffer framebuffer)
         //actual render
         for (int x = startX; x < endX; x++)
         {
-            // Depth test once per column
+            //depth test once per column
             if (!(correctedDistance < gDepthBuffer[x] || gDepthBuffer[x] == -1))
             {
                 continue;
@@ -330,7 +336,7 @@ void Render(Framebuffer framebuffer)
                     //get the alpha to see if its transparent
                     uint8_t a = (color >> 24) & 0xFF;
 
-                    // Transparent pixel
+                    //do not render the pixel if its transparent
                     if (a == 0)
                     {
                         continue;

@@ -7,8 +7,7 @@
 #include "helperFunctions.hpp"
 #include "input.hpp"
 
-const float playerRadius = 0.2f;
-
+//Process the input with the keyboard, and movement
 void processInput() {
 
     float movementAngle = -cfg.angleOffset;
@@ -70,12 +69,12 @@ void processInput() {
     float newX = cfg.playerX + moveX * moveSpeedNow * deltaTime;
     float newY = cfg.playerY + moveY * moveSpeedNow * deltaTime;
 
-    if (CanMoveTo(newX, cfg.playerY))
+    if (moveX != 0.0f && CanMoveTo(newX, cfg.playerY))
     {
         cfg.playerX = newX;
     }
 
-    if (CanMoveTo(cfg.playerX, newY))
+    if (moveY != 0.0f && CanMoveTo(cfg.playerX, newY))
     {
         cfg.playerY = newY;
     }
@@ -96,4 +95,32 @@ void processInput() {
 
     if (cfg.angleOffset >= 270) { cfg.angleOffset = -90; }
     else if (cfg.angleOffset <= -270) { cfg.angleOffset = 90; }
+}
+
+const float pickUpRadius = 0.5f;
+const float pickUpRadiusSquared = pickUpRadius * pickUpRadius;
+
+//Process the entity pickups
+void processEntities() {
+
+    //loop over all entities
+    for (auto& entity : worldEntities) {
+
+        //if entity tag is 0, then it doesnt give any tag. Also skip hidden entities. TODO: add the heatlh check to only give tag if health is -1 (static entity)
+        if (gEntityTypes[entity.entityTypeIndex].tag == 0 || !entity.active) {
+            continue;
+        }
+
+        //calulate the difference in each coordinate
+        float dx = cfg.playerX - entity.x;
+        float dy = cfg.playerY - entity.y;
+
+        //compare distances squared
+        float distanceSquared = (dx * dx) + (dy * dy);
+
+        if (distanceSquared <= pickUpRadiusSquared) {
+            entity.active = false;
+            gPlayerTags.insert(gEntityTypes[entity.entityTypeIndex].tag);
+        }
+    }
 }

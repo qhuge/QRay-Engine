@@ -29,7 +29,7 @@ struct Tile
 	int y;
     int tileTypeIndex;
 
-    DoorDirection doorDirection = DoorDirection::None; //the 2 door TILES are placed in horizontal order.
+    DoorDirection doorDirection = DoorDirection::None; //the 2 door TILES are placed in horizontal order. (note to self later: what the fuck does this comment even mean??)
 };
 struct TileType
 {
@@ -42,6 +42,8 @@ struct TileType
 	int timesUsed = 0;
 
     bool isDoor = false;
+
+    int tag = 0; //this only applies when isDoor = true!!!!!!!!!!!
 };
 
 struct Entity

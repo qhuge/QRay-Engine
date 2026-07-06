@@ -16,8 +16,8 @@ bool IsNearTile(const Tile& tile, float margin);
 
 bool PlayerBetweenDoor(const Tile& doorTile1, const Tile& doorTile2);
 
-bool IsWallAt(float x, float y);
+bool isWallAt(int x, int y);
 
 bool CanMoveTo(float x, float y);
 
-static bool hasTag(int tag);
+bool hasTag(int tag);

@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <unordered_set>
 #include "types.hpp"
 
 struct GameConfig {
@@ -59,4 +60,4 @@ extern std::vector<Texture> gTextures;
 
 extern std::vector<EntityType> gEntityTypes;
 
-extern std::vector<int> gPlayerTags;
+extern std::unordered_set<int> gPlayerTags;

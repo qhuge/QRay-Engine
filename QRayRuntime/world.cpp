@@ -69,6 +69,8 @@ bool LoadWorld(const char* filename)
             entity.x += 0.5f;
             entity.y += 0.5f;
 
+            entity.entityTypeIndex = entity.textureIndex - (cfg.textureAmount - cfg.entityAmount);
+
             worldEntities.push_back(entity);
             break;
         }
@@ -101,6 +103,9 @@ bool LoadWorld(const char* filename)
                 default: return false;
             }
             tile.door.open = 0.0f;
+
+            //set the tag
+            ss >> tile.door.tag;
 
             worldWalls.push_back(tile);
             break;

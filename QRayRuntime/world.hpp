@@ -27,6 +27,7 @@ struct Door
     bool targetOpen = false;
     float openTimer = 0.0f;
     int indexOfOtherDoorTile;
+    int tag;
 };
 
 struct Tile
@@ -44,6 +45,7 @@ struct Entity
     float x;
     float y;
     uint16_t textureIndex;
+    int entityTypeIndex; // this is a index in gEntityTypes, calculated at game start based on textureIndex, textureAmount and entityAmount.
     bool active = true;
 };
 

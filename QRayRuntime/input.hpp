@@ -1,1 +1,3 @@
 void processInput();
+
+void processEntities();

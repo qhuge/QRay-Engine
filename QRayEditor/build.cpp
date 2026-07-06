@@ -39,7 +39,8 @@ void WriteMap(std::string buildFolder, std::vector<Tile> tiles, std::vector<Enti
 			std::string newString;
 
 			if (currentTile.doorDirection != DoorDirection::None) {
-				newString = "D " + std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " " + std::to_string(currentTile.tileTypeIndex) + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "0" : "1") + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "1" : "2") + "\nD " + std::to_string(currentTile.x + (currentTile.doorDirection == DoorDirection::Horizontal ? 1 : 0)) + " " + std::to_string(currentTile.y + (currentTile.doorDirection == DoorDirection::Horizontal ? 0 : 1)) + " " + std::to_string(currentTile.tileTypeIndex) + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "0" : "1") + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "3" : "0");
+				//wtf is the line below
+				newString = "D " + std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " " + std::to_string(currentTile.tileTypeIndex) + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "0" : "1") + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "1" : "2") + " " + std::to_string(save.tileTypes[currentTile.tileTypeIndex].tag) + "\nD " + std::to_string(currentTile.x + (currentTile.doorDirection == DoorDirection::Horizontal ? 1 : 0)) + " " + std::to_string(currentTile.y + (currentTile.doorDirection == DoorDirection::Horizontal ? 0 : 1)) + " " + std::to_string(currentTile.tileTypeIndex) + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "0" : "1") + " " + (currentTile.doorDirection == DoorDirection::Horizontal ? "3" : "0") + " " + std::to_string(save.tileTypes[currentTile.tileTypeIndex].tag);
 			}
 			else {
 				newString = "T " + std::to_string(currentTile.x) + " " + std::to_string(currentTile.y) + " " + std::to_string(currentTile.tileTypeIndex);
@@ -80,7 +81,8 @@ bool ConvertPngToQRayAsset(const std::string& inputPng, const std::string& outpu
 
 	unsigned char* data = stbi_load(inputPng.c_str(), &width, &height, &channels, 4);
 
-	if (!data || (width != 32 || height != 32)) {
+	//TODO: check dimensions of texture
+	if (!data) {
 		return false;
 	}
 

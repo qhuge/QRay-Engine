@@ -26,7 +26,7 @@ A WIP raycasting game engine.
 
 ## Latest features
 
-You can now save and load editor projects!
+The entity and door tagging system works sort of... And entity collisions work also!
 
 This repo also features an example project, and the game built from that. Also there's some textures for experimenting!
 Keep in mind the game is built using Debug binaries, so the file size is bigger than usual.
@@ -39,7 +39,7 @@ Here's a list of features that I consider are "high priority"
 - Some kind of ui support
 - Weapons
 - Better visualizing of the map in the editor
-- Entity collisions
+- Better documentation of the features
 
 Things below are not necessarily needed but would be nice to have
 

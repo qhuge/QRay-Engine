@@ -11,6 +11,7 @@ static bool gOpenPopup = false;
 static char gTileName[64] = "New Tile";
 static std::string gPendingTexture;
 static bool gPendingDoor = false;
+int gPendingTag = 0;
 
 void OpenAddTilePopup()
 {
@@ -18,6 +19,7 @@ void OpenAddTilePopup()
     gOpenPopup = true;
     strcpy_s(gTileName, "New Tile");
     gPendingTexture.clear();
+    gPendingTag = 0;
 }
 
 void DrawAddTilePopup()
@@ -48,6 +50,15 @@ void DrawAddTilePopup()
 
         ImGui::Checkbox("Door", &gPendingDoor);
 
+        if (gPendingDoor) {
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(80.0f);
+            ImGui::InputInt("Tag", &gPendingTag);
+
+            if (gPendingTag < 0)
+                gPendingTag = 0;
+        }
+
         ImGui::Separator();
 
         float footerY = ImGui::GetWindowHeight() - ImGui::GetFrameHeightWithSpacing() - 10.0f;
@@ -65,6 +76,11 @@ void DrawAddTilePopup()
                     strcpy_s(t.name, gTileName);
                     strcpy_s(t.texturePath, relative.c_str());
                     t.isDoor = gPendingDoor;
+
+                    //also assign the tag if its a door
+                    if (gPendingDoor) {
+                        t.tag = gPendingTag;
+                    }
 
                     SetRandomColorForTile(t);
 
