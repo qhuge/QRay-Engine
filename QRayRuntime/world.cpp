@@ -69,7 +69,13 @@ bool LoadWorld(const char* filename)
             entity.x += 0.5f;
             entity.y += 0.5f;
 
+            //set the target location to be the same as the current position so the movement code will take over!
+            entity.targetX = entity.x;
+            entity.targetY = entity.y;
+
             entity.entityTypeIndex = entity.textureIndex - (cfg.textureAmount - cfg.entityAmount);
+
+            entity.health = gEntityTypes[entity.entityTypeIndex].health;
 
             worldEntities.push_back(entity);
             break;

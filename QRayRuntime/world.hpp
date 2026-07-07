@@ -47,6 +47,9 @@ struct Entity
     uint16_t textureIndex;
     int entityTypeIndex; // this is a index in gEntityTypes, calculated at game start based on textureIndex, textureAmount and entityAmount.
     bool active = true;
+    int health;
+    float targetX;//used for movement
+    float targetY;//used for movement
 };
 
 bool TileMatches(const Tile& tile, int x, int y);

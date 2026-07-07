@@ -12,22 +12,13 @@
 #include "world.hpp"
 #include "types.hpp"
 #include "entity_rendering.hpp"
-#include "input.hpp"
 
 std::vector<float> gDepthBuffer;
 
 void Render(Framebuffer framebuffer)
 {
-    //First process input (and handle movement)
-    processInput();
 
-    //process the entity pickups
-    processEntities();
-
-    // =========================================
-    // FLOOR + CEILING
-    // =========================================
-
+    //FLOOR + CEILING
     for (int y = 0; y < framebuffer.height / 2; y++)
     {
         uint32_t* row = framebuffer.pixels + y * framebuffer.width;

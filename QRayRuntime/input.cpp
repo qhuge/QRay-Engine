@@ -98,29 +98,96 @@ void processInput() {
 }
 
 const float pickUpRadius = 0.5f;
-const float pickUpRadiusSquared = pickUpRadius * pickUpRadius;
+const float movementRadius = 0.2f;
+const float movementSpeed = 0.5f;
 
-//Process the entity pickups
+const float pickUpRadiusSquared = pickUpRadius * pickUpRadius;
+const float movementRadiusSquared = movementRadius * movementRadius;
+const int offsets[4][2] =
+{
+    { 0, -1},
+    {-1,  0},
+    { 1,  0},
+    { 0,  1},
+};
+//Process the entity pickups and movement
 void processEntities() {
 
     //loop over all entities
     for (auto& entity : worldEntities) {
 
-        //if entity tag is 0, then it doesnt give any tag. Also skip hidden entities. TODO: add the heatlh check to only give tag if health is -1 (static entity)
-        if (gEntityTypes[entity.entityTypeIndex].tag == 0 || !entity.active) {
+        //skip unactive entities
+        if (!entity.active) {
             continue;
         }
 
-        //calulate the difference in each coordinate
-        float dx = cfg.playerX - entity.x;
-        float dy = cfg.playerY - entity.y;
+        //if entity tag isnt 0 and it has -1 health. TODO: handle tag awarding from enemies when damaging them
+        if (gEntityTypes[entity.entityTypeIndex].tag != 0 && entity.health == -1) {
 
-        //compare distances squared
-        float distanceSquared = (dx * dx) + (dy * dy);
+            //calulate the difference in each coordinate
+            float dx = cfg.playerX - entity.x;
+            float dy = cfg.playerY - entity.y;
 
-        if (distanceSquared <= pickUpRadiusSquared) {
-            entity.active = false;
-            gPlayerTags.insert(gEntityTypes[entity.entityTypeIndex].tag);
+            //compare distances squared
+            float distanceSquared = (dx * dx) + (dy * dy);
+
+            if (distanceSquared <= pickUpRadiusSquared) {
+                entity.active = false;
+                gPlayerTags.insert(gEntityTypes[entity.entityTypeIndex].tag);
+            }
+        }
+
+        //handle movement: (static entities dont move)
+        if (gEntityTypes[entity.entityTypeIndex].idleMovement == IDLE_RANDOM_WALK && entity.health != -1) {
+            //Check if we are close enough to the location:
+            float dx = entity.targetX - entity.x;
+            float dy = entity.targetY - entity.y;
+
+            float distanceSquared = (dx * dx) + (dy * dy);
+
+            if (distanceSquared <= movementRadiusSquared) {
+                //calculate new target location:
+                std::vector<std::pair<int, int>> candidates;
+                int tileX = (int)floorf(entity.x);
+                int tileY = (int)floorf(entity.y);
+                for (int i = 0; i < 4; i++)
+                {
+                    int x = tileX + offsets[i][0];
+                    int y = tileY + offsets[i][1];
+
+                    if (!isWallAt(x, y))
+                    {
+                        candidates.emplace_back(x, y);
+                    }
+                }
+
+                if (!candidates.empty())
+                {
+                    int index = rand() % candidates.size();
+                    entity.targetX = candidates[index].first + 0.5f;
+                    entity.targetY = candidates[index].second + 0.5f;
+
+                    //recalculate the vector and distance
+                    dx = entity.targetX - entity.x;
+                    dy = entity.targetY - entity.y;
+                    distanceSquared = (dx * dx) + (dy * dy);
+                }
+            }
+
+            //this is some woodoo shit google gave me:
+            float xhalf = 0.5f * distanceSquared;
+            int i = *(int*)&distanceSquared;
+            i = 0x5f3759df - (i >> 1);
+            float invDistance = *(float*)&i;
+            invDistance = invDistance * (1.5f - xhalf * invDistance * invDistance);
+
+            //unit vector?
+            float ux = dx * invDistance;
+            float uy = dy * invDistance;
+
+            //move along said unit vecotr
+            entity.x += ux * movementSpeed * deltaTime;
+            entity.y += uy * movementSpeed * deltaTime;
         }
     }
 }

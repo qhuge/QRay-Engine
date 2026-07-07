@@ -7,20 +7,13 @@
 #include "world.hpp"
 #include <string>
 #include "helperFunctions.hpp"
+#include "input.hpp"
 
 static auto lastTime = std::chrono::high_resolution_clock::now();
 
 float deltaTime = 0.0f;
 
 static Win32State* gWin32 = nullptr;
-
-void ClearScreen(Framebuffer framebuffer, uint32_t color)
-{
-    for (int i = 0; i < framebuffer.width * framebuffer.height; i++)
-    {
-        framebuffer.pixels[i] = color;
-    }
-}
 
 void PutPixel(Framebuffer framebuffer, int x, int y, uint32_t color)
 {
@@ -179,6 +172,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             if (door.open < 0.0f)
                 door.open = 0.0f;
         }
+
+        //First process input (and handle movement)
+        processInput();
+
+        //process the entity pickups
+        processEntities();
 
         // Render frame
         Render(win32.framebuffer);
