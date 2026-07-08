@@ -110,7 +110,7 @@ const int offsets[4][2] =
     { 1,  0},
     { 0,  1},
 };
-//Process the entity pickups and movement
+//Process the entity pickups and movement, + anims
 void processEntities() {
 
     //loop over all entities
@@ -119,6 +119,23 @@ void processEntities() {
         //skip unactive entities
         if (!entity.active) {
             continue;
+        }
+
+        if (entity.animate) {
+            entity.animationDuration -= deltaTime;
+
+            if (entity.animationDuration <= 0) {
+                //reset the duration to the max
+                entity.animationDuration = entity.maxAnimationDuration;
+
+                //show next frame
+                entity.frameIndex++;
+
+                //loop back to first frame if needed
+                if (entity.frameIndex > entity.maxFrameIndex) {
+                    entity.frameIndex = 0;
+                }
+            }
         }
 
         //if entity tag isnt 0 and it has -1 health. TODO: handle tag awarding from enemies when damaging them

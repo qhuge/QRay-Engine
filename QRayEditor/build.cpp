@@ -76,7 +76,7 @@ void WriteData(const GameConfig& config, std::string buildFolder)
 	file.close();
 }
 
-bool ConvertPngToQRayAsset(const std::string& inputPng, const std::string& outputFile) {
+bool ConvertPngToQRayAsset(const std::string& inputPng, const std::string& outputFile, int frameWidth, int frameHeight, float frameTime) {
 	int width, height, channels;
 
 	unsigned char* data = stbi_load(inputPng.c_str(), &width, &height, &channels, 4);
@@ -86,16 +86,57 @@ bool ConvertPngToQRayAsset(const std::string& inputPng, const std::string& outpu
 		return false;
 	}
 
+	//if the framesize is -1 then assume only 1 frame
+	if (frameHeight == -1 || frameWidth == -1) {
+		frameHeight = height;
+		frameWidth = width;
+	}
+
+	//calculate how many frames the sheet contains
+	int columns = width / frameWidth;
+	int rows = height / frameHeight;
+
+	int frameCount = columns * rows;
+
+	//write the header
 	QRayTextureAssetHeader header;
-	header.width = width;
-	header.height = height;
+	header.width = frameWidth;
+	header.height = frameHeight;
 	header.channels = 4;
+	header.frames = frameCount;
+
+	//this should be named better?
+	header.maxAnimationDuration = frameTime;
 
 	std::ofstream file(outputFile, std::ios::binary);
 
 	file.write((char*)&header, sizeof(header));
-	file.write((char*)data, width * height * 4);
 
+	//write the frames
+	for (int frame = 0; frame < frameCount; frame++)
+	{
+		int frameX = (frame % columns) * frameWidth;
+		int frameY = (frame / columns) * frameHeight;
+
+		std::vector<unsigned char> framePixels(frameWidth * frameHeight * 4);
+
+		for (int y = 0; y < frameHeight; y++)
+		{
+			for (int x = 0; x < frameWidth; x++)
+			{
+				int srcX = frameX + x;
+				int srcY = frameY + y;
+
+				framePixels[(y * frameWidth + x) * 4] = data[(srcY * width + srcX) * 4];
+				framePixels[(y * frameWidth + x) * 4 + 1] = data[(srcY * width + srcX) * 4 + 1];
+				framePixels[(y * frameWidth + x) * 4 + 2] = data[(srcY * width + srcX) * 4 + 2];
+				framePixels[(y * frameWidth + x) * 4 + 3] = data[(srcY * width + srcX) * 4 + 3];
+			}
+		}
+
+		file.write((char*)framePixels.data(), frameWidth * frameHeight * 4);
+	}
+	
 	file.close();
 
 	stbi_image_free(data);
@@ -150,7 +191,7 @@ void build(std::string path) {
 	for (int i = 0; i < save.tileTypes.size(); i++) {
 		TileType& currentTileType = save.tileTypes[i];
 		if (currentTileType.timesUsed > 0) {
-			ConvertPngToQRayAsset((saveLocation + "\\" + currentTileType.texturePath), (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedTiles) + ".qrayasset"));
+			ConvertPngToQRayAsset((saveLocation + "\\" + currentTileType.texturePath), (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedTiles) + ".qrayasset"), currentTileType.frameWidth, currentTileType.frameHeight, 0.1f);
 		}
 		else {
 			//if we skip a texture we must not then build that
@@ -170,7 +211,7 @@ void build(std::string path) {
 	for (int i = 0; i < save.entityTypes.size(); i++) {
 		EntityType& currentEntityType = save.entityTypes[i];
 		if (currentEntityType.timesUsed > 0) {
-			ConvertPngToQRayAsset((saveLocation + "\\" + currentEntityType.texturePath), (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedEntities + amountOfTileAssets) + ".qrayasset"));
+			ConvertPngToQRayAsset((saveLocation + "\\" + currentEntityType.texturePath), (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedEntities + amountOfTileAssets) + ".qrayasset"), currentEntityType.frameWidth, currentEntityType.frameHeight, currentEntityType.frameTime);
 			WriteEntityFile(currentEntityType, (buildFolder + "\\assets\\" + std::to_string(i - amountOfSkippedEntities + amountOfTileAssets) + ".qrayentity"));
 		}
 		else {
@@ -186,6 +227,7 @@ void build(std::string path) {
 	}
 	int amountOfEntityAssets = save.entityTypes.size() - amountOfSkippedEntities;
 
+	//write various stuff to the gameconfig
 	cfg.textureAmount = amountOfTileAssets + amountOfEntityAssets;
 	cfg.WINDOW_HEIGHT = save.resolutionY;
 	cfg.WINDOW_WIDTH = save.resolutionX;
@@ -197,7 +239,6 @@ void build(std::string path) {
 	//ceil and floor colors
 	cfg.ceilingColor = (uint32_t(save.ceilingColor[0] * 255.0f) << 16) | (uint32_t(save.ceilingColor[1] * 255.0f) << 8) | (uint32_t(save.ceilingColor[2] * 255.0f));
 	cfg.floorColor = (uint32_t(save.floorColor[0] * 255.0f) << 16) | (uint32_t(save.floorColor[1] * 255.0f) << 8) | (uint32_t(save.floorColor[2] * 255.0f));
-
 
 	//write map file
 	WriteMap(buildFolder, newMap, newEnt, cfg);

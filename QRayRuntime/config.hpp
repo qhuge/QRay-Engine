@@ -47,12 +47,16 @@ struct Texture
 {
 	uint32_t width;
 	uint32_t height;
-	std::vector<uint32_t> pixels;
+	uint32_t frames; //for animation
+	float maxAnimationDuration;//for anim
+	std::vector<std::vector<uint32_t>> pixels;
 };
 struct QRayTextureAssetHeader
 {
 	uint32_t width;
 	uint32_t height;
+	uint32_t frames; //for animation
+	float maxAnimationDuration;//for anim
 	uint32_t channels;
 };
 

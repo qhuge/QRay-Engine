@@ -15,6 +15,10 @@ static uint32_t gEntityTag = 0;
 static int gIdleMovement = IDLE_NONE;
 static int gLOSMovement = LOS_NONE;
 static bool gEntityStatic = true;
+static int gframeWidth = -1;
+static int gframeHeight = -1;
+static bool gEntityFrames = false;
+static int gframeTime = 100;
 
 void OpenAddEntityPopup()
 {
@@ -26,6 +30,10 @@ void OpenAddEntityPopup()
     gEntityTag = 0;
     gHealth = 100;
     gPendingTexture.clear();
+    gframeWidth = -1;
+    gframeHeight = -1;
+    gEntityFrames = false;
+    gframeTime = 100;
 }
 
 void DrawAddEntityPopup()
@@ -36,7 +44,7 @@ void DrawAddEntityPopup()
         gOpenPopup = false;
     }
 
-    ImGui::SetNextWindowSize(ImVec2(600, 380), ImGuiCond_Appearing);
+    ImGui::SetNextWindowSize(ImVec2(600, 440), ImGuiCond_Appearing);
 
     if (ImGui::BeginPopupModal("Add Entity Type", nullptr, ImGuiWindowFlags_NoResize))
     {
@@ -53,6 +61,41 @@ void DrawAddEntityPopup()
         {
             gPendingTexture = OpenFileDialogPNG();
         }
+
+        //only how is the sprite has frames
+        ImGui::Checkbox("Has animation", &gEntityFrames);
+        if (gEntityFrames) {
+            ImGui::Text("Sprite size:");
+
+            //ugly code sorry about that
+            ImGui::Text("width:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(80.0f);
+            ImGui::InputInt("##width", &gframeWidth, 0);
+            ImGui::SameLine();
+            ImGui::Text("heigth:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(80.0f);
+            ImGui::InputInt("##heigth", &gframeHeight, 0);
+            ImGui::SameLine();
+            ImGui::Text("time (ms):");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(80.0f);
+            ImGui::InputInt("##time", &gframeTime, 0);
+
+            //ensure that the values are withing bounds
+            if (gframeWidth < -1)
+                gframeWidth = -1;
+            if (gframeHeight < -1)
+                gframeHeight = -1;
+            if (gframeTime <= 0) {
+                gframeTime = 1;
+            }
+            else if (gframeTime > 1000) {
+                gframeTime = 1000;
+            }
+        }
+        
 
         ImGui::Separator();
 
@@ -125,6 +168,9 @@ void DrawAddEntityPopup()
                     strcpy_s(e.name, gEntityName);
                     strcpy_s(e.texturePath, relative.c_str());
                     e.tag = gEntityTag;
+                    e.frameHeight = gframeHeight;
+                    e.frameWidth = gframeWidth;
+                    e.frameTime = (gframeTime / 1000.0f);
 
                     if (gEntityStatic)
                     {

@@ -50,6 +50,11 @@ struct Entity
     int health;
     float targetX;//used for movement
     float targetY;//used for movement
+    int frameIndex = 0; //used for anims
+    int maxFrameIndex; //used for anims
+    bool animate = false; //use animation?
+    float animationDuration;
+    float maxAnimationDuration;
 };
 
 bool TileMatches(const Tile& tile, int x, int y);

@@ -77,6 +77,9 @@ void DrawAddTilePopup()
                     strcpy_s(t.texturePath, relative.c_str());
                     t.isDoor = gPendingDoor;
 
+                    //tiles dont support animation, thus their frame size is the same as png size.
+                    t.frameHeight, t.frameHeight = -1;
+
                     //also assign the tag if its a door
                     if (gPendingDoor) {
                         t.tag = gPendingTag;

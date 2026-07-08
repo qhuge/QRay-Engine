@@ -77,6 +77,14 @@ bool LoadWorld(const char* filename)
 
             entity.health = gEntityTypes[entity.entityTypeIndex].health;
 
+            //set the animation max index
+            entity.maxFrameIndex = gTextures[entity.textureIndex].frames - 1;
+
+            if (entity.maxFrameIndex > 0) {
+                entity.animate = true;
+                entity.maxAnimationDuration = gTextures[entity.textureIndex].maxAnimationDuration;
+            }
+
             worldEntities.push_back(entity);
             break;
         }
@@ -191,12 +199,20 @@ Texture LoadQRayAsset(std::string path)
     Texture tex;
     tex.width = header.width;
     tex.height = header.height;
+    tex.frames = header.frames;
+    tex.maxAnimationDuration = header.maxAnimationDuration;
 
+    //size of 1 frame
     size_t pixelCount = header.width * header.height;
 
-    tex.pixels.resize(pixelCount);
+    tex.pixels.resize(header.frames);
 
-    file.read((char*)tex.pixels.data(), pixelCount * sizeof(uint32_t));
+    //read all the frames
+    for (int i = 0; i < header.frames; i++) {
+        tex.pixels[i].resize(pixelCount);
+        file.read(reinterpret_cast<char*>(tex.pixels[i].data()), pixelCount * sizeof(uint32_t));
+    }
+    
 
     return tex;
 }

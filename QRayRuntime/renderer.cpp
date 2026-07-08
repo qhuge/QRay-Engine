@@ -135,7 +135,7 @@ void Render(Framebuffer framebuffer)
                     int index = texY * tex->width + texX;
 
                     //get the pixel at that specific index
-                    pixel = tex->pixels[index];
+                    pixel = tex->pixels[0][index];
                 }
                 
                 //increment the texPos
@@ -276,6 +276,12 @@ void Render(Framebuffer framebuffer)
             tex = &gTextures[e->textureIndex];
         }
 
+        //calculate the brightness
+        float brightness = CalcColorMult(correctedDistance);
+
+        //int multiplication is faster than float
+        int light = (int)(brightness * 255.0f);
+
         //actual render
         for (int x = startX; x < endX; x++)
         {
@@ -321,8 +327,8 @@ void Render(Framebuffer framebuffer)
                     //get the index of the color at textureX, textureY.
                     int index = textureY * tex->width + textureX;
 
-                    //get the color
-                    uint32_t color = tex->pixels[index];
+                    //get the color (use frameIndex, that way the animations actually work!!!!!)
+                    uint32_t color = tex->pixels[e->frameIndex][index];
 
                     //get the alpha to see if its transparent
                     uint8_t a = (color >> 24) & 0xFF;
@@ -337,6 +343,11 @@ void Render(Framebuffer framebuffer)
                     uint8_t r = color & 0xFF;
                     uint8_t g = (color >> 8) & 0xFF;
                     uint8_t b = (color >> 16) & 0xFF;
+
+                    //>>8 is faster than dividing by 255
+                    r = (r * light) >> 8;
+                    g = (g * light) >> 8;
+                    b = (b * light) >> 8;
 
                     //combine the channels back
                     framebufferColor = (r << 16) | (g << 8) | b;

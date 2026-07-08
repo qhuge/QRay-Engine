@@ -37,6 +37,8 @@ struct TileType
 
 	char texturePath[260];
 
+    int frameWidth, frameHeight;
+
 	int r, g, b;
 
 	int timesUsed = 0;
@@ -57,6 +59,10 @@ struct EntityType
 {
     char name[64];
     char texturePath[260];
+
+    int frameHeight, frameWidth;
+    float frameTime;
+
     int r, g, b;
 
     int timesUsed = 0;
