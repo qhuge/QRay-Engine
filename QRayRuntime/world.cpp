@@ -18,6 +18,10 @@ bool TileMatches(const Tile& tile, int x, int y)
 //btw note to the future employer: this code below right here tripled the fps!!!!!!!!! 
 int FindWall(int x, int y)
 {
+    if (x < 0 || x > 64 || y < 0 || y > 64) {
+        return -1;
+    }
+
     return worldGrid[x][y];
 
     //old implementation (slow) (idk who came up with this crap...)
