@@ -62,6 +62,7 @@ bool TileMatches(const Tile& tile, int x, int y);
 int FindWall(int x, int y);
 
 extern std::vector<Tile> worldWalls;
+extern int worldGrid[64][64];
 extern std::vector<Entity> worldEntities;
 
 bool LoadWorld(const char* filename);

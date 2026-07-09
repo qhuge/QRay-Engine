@@ -5,6 +5,9 @@
 
 std::vector<Tile> worldWalls;
 
+//grid used to speedup locating tiles on specific coordinates
+int worldGrid[64][64];
+
 std::vector<Entity> worldEntities;
 
 bool TileMatches(const Tile& tile, int x, int y)
@@ -12,10 +15,13 @@ bool TileMatches(const Tile& tile, int x, int y)
     return tile.x == x && tile.y == y;
 }
 
-//TODO: start using grid based lookup instead of looping through the list of walls. this would bring the complexity from O(n) to O(1)
+//btw note to the future employer: this code below right here tripled the fps!!!!!!!!! 
 int FindWall(int x, int y)
 {
-    for (int i = 0; i < worldWalls.size(); i++)
+    return worldGrid[x][y];
+
+    //old implementation (slow) (idk who came up with this crap...)
+    /*for (int i = 0; i < worldWalls.size(); i++)
     {
         if (worldWalls[i].x == x &&
             worldWalls[i].y == y)
@@ -23,7 +29,7 @@ int FindWall(int x, int y)
             return i;
         }
     }
-    return -1;
+    return -1;*/
 }
 
 bool LoadWorld(const char* filename)
@@ -135,6 +141,20 @@ bool LoadWorld(const char* filename)
         default:
             return false;
         }
+    }
+
+    //initialize the grid
+    for (int y = 0; y < 64; y++)
+    {
+        for (int x = 0; x < 64; x++)
+        {
+            worldGrid[x][y] = -1;
+        }
+    }
+    //then set the proper indecies
+    for (int i = 0; i < worldWalls.size(); i++)
+    {
+        worldGrid[worldWalls[i].x][worldWalls[i].y] = i;
     }
 
     //set door indexes

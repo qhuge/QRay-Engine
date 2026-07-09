@@ -38,7 +38,6 @@ Keep in mind the game is built using Debug binaries, so the file size is bigger 
 
 Here's a list of features that I consider are "high priority"
 
-- Moving entities
 - Some kind of ui support
 - Weapons
 - Better visualizing of the map in the editor
@@ -49,3 +48,4 @@ Things below are not necessarily needed but would be nice to have
 - Multiple map support? (Load new map after getting to a specific point in the previous one)
 - HTML build target (using HTML5 Canvas or WebGL)
 - "View bobbing" when running
+- Better entity movement (waypoints?)

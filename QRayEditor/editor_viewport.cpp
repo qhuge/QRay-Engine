@@ -14,8 +14,8 @@ static float gridSize = 32.0f;
 const float TILE_SIZE = 32.0f;
 const float RADIUS = 8.0f;
 static ImVec2 cameraOffset(0.0f, 0.0f);
-const int MAP_W = 100;
-const int MAP_H = 100;
+const int MAP_W = 64;
+const int MAP_H = 64;
 
 void DrawGrid(ImDrawList* drawList, ImVec2 origin, ImVec2 size)
 {
